@@ -1,8 +1,17 @@
 {
   "files": [],
   "references": [
-    { "path": "./packages/shared" },
-    { "path": "./apps/api" },
-    { "path": "./apps/realtime" }
+    {
+      "path": "./packages/shared"
+    },
+    {
+      "path": "./packages/db"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/realtime"
+    }
   ]
 }

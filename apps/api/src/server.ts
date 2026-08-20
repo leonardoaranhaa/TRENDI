@@ -1,4 +1,7 @@
+import cookie from '@fastify/cookie';
+import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
+import type { PrismaClient } from '@trendi/db';
 import {
   CHOICE_WINDOW_MS,
   CROSS_VOTE_WEIGHTS,
@@ -8,15 +11,29 @@ import {
   PREPARATION_MS,
   VOTING_WINDOW_MS,
 } from '@trendi/shared';
+import { authRoutes } from './auth/routes.js';
+import { loadConfig, type ApiConfig } from './config.js';
+
+export interface ServerOptions {
+  readonly prisma: PrismaClient;
+  readonly config?: ApiConfig;
+  readonly logger?: boolean;
+}
 
 /**
- * Esqueleto da API. Os serviços de verdade entram nas tarefas seguintes:
- * identidade em C-02, fila e matchmaking em C-16, votação em C-09.
+ * A API HTTP: identidade hoje (C-02); fila, catálogo e ranking depois.
  *
  * Logs estruturados desde o dia 1 — 02-arquitetura/stack.md.
  */
-export function buildServer(): FastifyInstance {
-  const app = Fastify({ logger: true });
+export function buildServer(options: ServerOptions): FastifyInstance {
+  const config = options.config ?? loadConfig();
+  const app = Fastify({ logger: options.logger ?? true });
+
+  app.register(cookie);
+  // O cliente web manda cookie de sessão, então precisa vir na lista e com
+  // credenciais liberadas. Origem aberta aqui seria entregar a sessão.
+  app.register(cors, { origin: config.webOrigin, credentials: true });
+  app.register(authRoutes, { config, prisma: options.prisma });
 
   app.get('/health', () => ({ status: 'ok', service: 'api' }));
 

@@ -1,0 +1,20 @@
+# Servidor de tempo real. `fly deploy -c apps/realtime/fly.toml`
+#
+# Fica separado da API de propósito: carga de chat não pode derrubar login.
+# WebSocket é conexão longa — esta máquina nunca dorme.
+app = "trendi-realtime"
+primary_region = "gru"
+
+[build]
+  dockerfile = "apps/realtime/Dockerfile"
+
+[env]
+  REALTIME_PORT = "8080"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_start_machines = true
+  auto_stop_machines = false
+  min_machines_running = 1

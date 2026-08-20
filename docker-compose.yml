@@ -1,0 +1,23 @@
+# Postgres para desenvolvimento local.
+#
+# Não é obrigatório: sem DATABASE_URL, os testes sobem um Postgres em memória
+# (PGlite). Isto aqui é para rodar a API de verdade na sua máquina.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: trendi
+      POSTGRES_PASSWORD: trendi
+      POSTGRES_DB: trendi
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U trendi']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres:

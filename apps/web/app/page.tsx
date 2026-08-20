@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { CROSS_VOTE_WEIGHTS, DUEL_LIFECYCLE } from '@trendi/shared';
 
 /**
@@ -9,11 +10,17 @@ import { CROSS_VOTE_WEIGHTS, DUEL_LIFECYCLE } from '@trendi/shared';
 export default function Home() {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-10 px-6 py-20">
-      <header className="flex flex-col gap-2">
+      <header className="flex flex-col gap-3">
         <h1 className="text-4xl font-bold tracking-tight">TRENDI</h1>
         <p className="text-neutral-400">
           Duelos ao vivo entre criadores. Em construção — Fase 1.
         </p>
+        <Link
+          href="/entrar"
+          className="w-fit rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium transition hover:border-neutral-500 hover:bg-neutral-900"
+        >
+          Entrar
+        </Link>
       </header>
 
       <section className="flex flex-col gap-3">

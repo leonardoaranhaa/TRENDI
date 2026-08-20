@@ -1,0 +1,198 @@
+// Fonte da verdade do schema (decisão D-13, revista em C-02).
+//
+// Nomes: modelos em PascalCase no código, tabelas e colunas em snake_case no
+// banco — o mapa português↔inglês está no README deste pacote (decisão D-10).
+//
+// As migrations continuam sendo SQL puro em prisma/migrations/, legível sem
+// ferramenta e aplicável com psql. O teste de migrations roda todas elas num
+// Postgres em memória a cada `npm test`.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String    @id @db.Uuid
+  handle      String    @unique
+  // Nulo porque nem todo provedor de OAuth devolve e-mail: no Discord o
+  // usuário pode negar o escopo. Identidade é a conta do provedor, não o e-mail.
+  email       String?   @unique
+  displayName String?   @map("display_name")
+  avatarUrl   String?   @map("avatar_url")
+  role        String    @default("viewer")
+  status      String    @default("active")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  creator     Creator?
+  accounts    Account[]
+  sessions    Session[]
+  attendance  Attendance[]
+  messages    Message[]
+  resultVotes ResultVote[]
+  duelsAsA    Duel[]       @relation("creatorA")
+  duelsAsB    Duel[]       @relation("creatorB")
+
+  @@map("users")
+}
+
+/// Conta de um provedor de OAuth ligada a um usuário. Um usuário pode ter
+/// Google e Discord apontando para a mesma conta TRENDI.
+model Account {
+  id                String   @id @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  provider          String
+  providerAccountId String   @map("provider_account_id")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+/// Sessão de login. O token nunca é guardado: só o hash dele (decisão D-16).
+model Session {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Creator {
+  userId          String   @id @map("user_id") @db.Uuid
+  averageAudience Int      @default(0) @map("average_audience")
+  totalDuels      Int      @default(0) @map("total_duels")
+  wins            Int      @default(0)
+  losses          Int      @default(0)
+  completionRate  Decimal? @map("completion_rate") @db.Decimal(5, 4)
+  rankingPoints   Int      @default(0) @map("ranking_points")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("creators")
+}
+
+model Challenge {
+  id               String  @id @db.Uuid
+  category         String
+  name             String
+  rules            String
+  judgingCriteria  String  @map("judging_criteria")
+  minDurationS     Int     @map("min_duration_s")
+  maxDurationS     Int     @map("max_duration_s")
+  durationOptionsS Int[]   @map("duration_options_s")
+  minAge           Int     @default(0) @map("min_age")
+  needsMaterial    Boolean @default(false) @map("needs_material")
+  needsMusic       Boolean @default(false) @map("needs_music")
+  active           Boolean @default(true)
+
+  duels Duel[]
+
+  @@map("challenges")
+}
+
+model Duel {
+  id               String    @id @db.Uuid
+  creatorA         String    @map("creator_a") @db.Uuid
+  creatorB         String    @map("creator_b") @db.Uuid
+  state            String
+  stateEnteredAt   DateTime  @default(now()) @map("state_entered_at") @db.Timestamptz(6)
+  challengeId      String?   @map("challenge_id") @db.Uuid
+  chosenDurationS  Int?      @map("chosen_duration_s")
+  startedAt        DateTime? @map("started_at") @db.Timestamptz(6)
+  endedAt          DateTime? @map("ended_at") @db.Timestamptz(6)
+  winner           String?
+  scoreA           Decimal?  @map("score_a") @db.Decimal(6, 5)
+  scoreB           Decimal?  @map("score_b") @db.Decimal(6, 5)
+  countsForRanking Boolean   @default(false) @map("counts_for_ranking")
+  recordingUrl     String?   @map("recording_url")
+
+  challenge   Challenge?       @relation(fields: [challengeId], references: [id])
+  userA       User             @relation("creatorA", fields: [creatorA], references: [id])
+  userB       User             @relation("creatorB", fields: [creatorB], references: [id])
+  transitions DuelTransition[]
+  attendance  Attendance[]
+  messages    Message[]
+  resultVotes ResultVote[]
+
+  @@index([state], map: "duels_state_idx")
+  @@map("duels")
+}
+
+/// Auditoria de toda transição de estado (convenção 3 de convencoes.md).
+model DuelTransition {
+  id          BigInt   @id @default(autoincrement())
+  duelId      String   @map("duel_id") @db.Uuid
+  fromState   String   @map("from_state")
+  toState     String   @map("to_state")
+  event       String
+  reason      String?
+  abandonment Boolean  @default(false)
+  occurredAt  DateTime @default(now()) @map("occurred_at") @db.Timestamptz(6)
+
+  duel Duel @relation(fields: [duelId], references: [id], onDelete: Cascade)
+
+  @@index([duelId, occurredAt], map: "duel_transitions_duel_idx")
+  @@map("duel_transitions")
+}
+
+model Attendance {
+  duelId   String   @map("duel_id") @db.Uuid
+  userId   String   @map("user_id") @db.Uuid
+  stand    String
+  joinedAt DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+  locked   Boolean  @default(false)
+
+  duel Duel @relation(fields: [duelId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([duelId, userId])
+  @@map("attendance")
+}
+
+model Message {
+  id               String   @id @db.Uuid
+  duelId           String   @map("duel_id") @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  stand            String
+  body             String
+  moderationStatus String   @default("approved") @map("moderation_status")
+  moderationReason String?  @map("moderation_reason")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  duel Duel @relation(fields: [duelId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([duelId, createdAt], map: "messages_duel_idx")
+  @@map("messages")
+}
+
+/// Voto de resultado. Não tem coluna de peso pago, e não vai ter: decisão D-03.
+model ResultVote {
+  duelId          String   @map("duel_id") @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  votedFor        String   @map("voted_for")
+  stand           String
+  annulled        Boolean  @default(false)
+  annulmentReason String?  @map("annulment_reason")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  duel Duel @relation(fields: [duelId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([duelId, userId])
+  @@map("result_votes")
+}

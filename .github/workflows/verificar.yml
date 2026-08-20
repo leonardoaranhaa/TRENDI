@@ -40,6 +40,27 @@ jobs:
 
   codigo:
     runs-on: ubuntu-latest
+
+    # Postgres de verdade: os mesmos testes que rodam em PGlite na máquina do
+    # dev rodam aqui contra o banco que vai para produção.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: trendi
+          POSTGRES_PASSWORD: trendi
+          POSTGRES_DB: trendi
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trendi"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://trendi:trendi@localhost:5432/trendi
+
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +70,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Cliente do Prisma
+        run: npm run generate -w @trendi/db
 
       - name: Tipos (pacotes, apps e testes)
         run: npm run typecheck

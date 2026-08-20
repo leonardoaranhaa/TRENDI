@@ -19,7 +19,7 @@ CREATE TABLE users (
 -- Extensão de user. Métricas de reputação; taxa de conclusão é pública
 -- (01-conceito/regras-do-duelo.md §5), nível de penalidade não.
 CREATE TABLE creators (
-  user_id            uuid PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
+  user_id            uuid PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
   average_audience   integer NOT NULL DEFAULT 0,
   total_duels        integer NOT NULL DEFAULT 0,
   wins               integer NOT NULL DEFAULT 0,
@@ -48,13 +48,13 @@ CREATE TABLE challenges (
 
 CREATE TABLE duels (
   id                  uuid PRIMARY KEY,
-  creator_a           uuid NOT NULL REFERENCES users (id),
-  creator_b           uuid NOT NULL REFERENCES users (id),
+  creator_a           uuid NOT NULL REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  creator_b           uuid NOT NULL REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
   state               text NOT NULL CHECK (state IN (
                         'queued', 'matched', 'accepted', 'choosing',
                         'preparing', 'running', 'voting', 'result', 'cancelled')),
   state_entered_at    timestamptz NOT NULL DEFAULT now(),
-  challenge_id        uuid REFERENCES challenges (id),
+  challenge_id        uuid REFERENCES challenges (id) ON DELETE SET NULL ON UPDATE CASCADE,
   chosen_duration_s   integer,
   started_at          timestamptz,
   ended_at            timestamptz,
@@ -73,7 +73,7 @@ CREATE INDEX duels_state_idx ON duels (state);
 -- (02-arquitetura/convencoes.md, regra 3).
 CREATE TABLE duel_transitions (
   id             bigserial PRIMARY KEY,
-  duel_id        uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE,
+  duel_id        uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE ON UPDATE CASCADE,
   from_state     text NOT NULL,
   to_state       text NOT NULL,
   event          text NOT NULL,
@@ -87,8 +87,8 @@ CREATE INDEX duel_transitions_duel_idx ON duel_transitions (duel_id, occurred_at
 
 -- Arquibancada do espectador. Trava quando a votação abre.
 CREATE TABLE attendance (
-  duel_id     uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE,
-  user_id     uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  duel_id     uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id     uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
   stand       text NOT NULL CHECK (stand IN ('a', 'b', 'general')),
   joined_at   timestamptz NOT NULL DEFAULT now(),
   locked      boolean NOT NULL DEFAULT false,
@@ -97,8 +97,8 @@ CREATE TABLE attendance (
 
 CREATE TABLE messages (
   id                  uuid PRIMARY KEY,
-  duel_id             uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE,
-  user_id             uuid NOT NULL REFERENCES users (id),
+  duel_id             uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id             uuid NOT NULL REFERENCES users (id) ON DELETE RESTRICT ON UPDATE CASCADE,
   -- Lê os três chats, escreve só no seu: a arquibancada da mensagem é a
   -- mesma de attendance. Ver decisão D-04.
   stand               text NOT NULL CHECK (stand IN ('a', 'b', 'general')),
@@ -117,8 +117,8 @@ CREATE INDEX messages_duel_idx ON messages (duel_id, created_at);
 -- resultado é sempre gratuito e igual. Presente e item pago afetam
 -- atmosfera e escolha de desafio — nunca o placar.
 CREATE TABLE result_votes (
-  duel_id           uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE,
-  user_id           uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  duel_id           uuid NOT NULL REFERENCES duels (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  user_id           uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
   voted_for         text NOT NULL CHECK (voted_for IN ('a', 'b')),
   -- Arquibancada de origem, travada na abertura da votação. É o que dá o
   -- peso cruzado: rival 0,50 / geral 0,35 / própria 0,15.
