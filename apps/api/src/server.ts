@@ -14,6 +14,7 @@ import {
 } from '@trendi/shared';
 import { nativeAuthRoutes } from './auth/native-routes.js';
 import { authRoutes } from './auth/routes.js';
+import { duelRoutes } from './duels/routes.js';
 import { loadConfig, type ApiConfig } from './config.js';
 
 export interface ServerOptions {
@@ -39,6 +40,7 @@ export function buildServer(options: ServerOptions): FastifyInstance {
   if (config.rateLimitEnabled) app.register(rateLimit, { global: false, max: 100, timeWindow: '1 minute' });
   app.register(authRoutes, { config, prisma: options.prisma });
   app.register(nativeAuthRoutes, { config, prisma: options.prisma });
+  app.register(duelRoutes, { config, prisma: options.prisma });
 
   app.get('/health', () => ({ status: 'ok', service: 'api' }));
 

@@ -75,10 +75,21 @@ Se você quiser codar hoje e nenhum `[L]` estiver resolvido, estas tarefas não 
 - ~~**C-02** identidade e login~~ ✅ (entra de verdade só com L-17)
 - ~~**C-07** chat por WebSocket~~ ✅
 - ~~**C-08** máquina de estados do duelo~~ ✅
-- **C-09** votação simples
+- ~~**C-09** votação simples~~ ✅
 - **C-14** fórmula do voto cruzado — 🟡 a fórmula está pronta e testada; falta plugar em C-09 e C-12
 
-**Sequência inicial:** C-01 → C-08 → C-14 → C-02 → C-37 → C-07. O coração lógico está de pé, com identidade e chat. O próximo passo sem bloqueio é **C-09** (votação simples), que já tem identidade para garantir uma conta, um voto, e máquina de estados para saber quando a janela abre e fecha.
+**Sequência executada:** C-01 → C-08 → C-14 (fórmula) → C-02 → C-37 → C-07 → C-09. O coração lógico está de pé: identidade, chat, ciclo do duelo e voto.
+
+**E agora a fila de código parou.** Todo `[C]` que resta na Fase 1 depende de `[L]`:
+
+| Para destravar | Falta |
+|---|---|
+| C-03 a C-06 (vídeo, estádio) | **L-03** — escolher o fornecedor |
+| C-10 (desafio da Aura) | **L-06** — escrever as regras dos 10 desafios |
+| Entrar por Google/Discord | **L-17** — registrar os apps |
+| Link de e-mail chegar | **L-18** — contratar provedor de e-mail |
+
+A Fase 2 tem tarefas tecnicamente livres (C-11 → C-12 → C-14 completa), mas o roadmap é explícito: construir Fase 2 durante a Fase 1 é como projeto solo não lança.
 
 ---
 

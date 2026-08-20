@@ -35,12 +35,17 @@
 | C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
 | C-07 | Chat único por WebSocket | C | ✅ | C-01 |
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
-| C-09 | Votação simples (sem peso cruzado) | C | ⬜ | C-08 |
+| C-09 | Votação simples (sem peso cruzado) | C | ✅ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | L-06 |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
 | C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
+
+> **A fila de código da Fase 1 acabou.** O que sobra aqui depende de você:
+> `C-10` espera `L-06` (regras dos desafios) e `C-03` a `C-06` esperam `L-03`
+> (fornecedor de vídeo). Construir Fase 2 agora seria exatamente o que o
+> roadmap manda não fazer.
 
 > `C-37` fez do login por senha a porta da frente (decisão D-19): dá para criar
 > conta e entrar sem depender de Google nem Discord. O que falta é o carteiro —

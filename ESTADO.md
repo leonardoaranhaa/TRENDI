@@ -25,7 +25,7 @@ O que está sendo trabalhado agora:
 | L-17 | Registrar apps OAuth no Google e no Discord | Leonardo | ⬜ |
 | L-18 | Contratar provedor de e-mail transacional | Leonardo | ⬜ **nova** |
 | C-07 | Chat único por WebSocket | Claude Code | ✅ |
-| C-09 | Votação simples (sem peso cruzado) | Claude Code | ⬜ próxima |
+| C-09 | Votação simples (sem peso cruzado) | Claude Code | ✅ |
 
 ---
 
@@ -57,9 +57,11 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-Do lado do código, sem depender de nenhum dos três: **C-09** (votação
-simples), que já tem identidade para garantir uma conta, um voto, e máquina de
-estados para saber quando a janela abre e fecha.
+**Do lado do código, a fila da Fase 1 acabou.** Identidade, chat, ciclo do
+duelo e votação estão de pé e testados. O que resta na fase depende de você:
+`L-03` destrava vídeo e estádio, `L-06` destrava o desafio da Aura.
+
+Construir Fase 2 agora seria justamente o que o roadmap manda não fazer.
 
 Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
 OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
@@ -85,6 +87,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-09: votação simples, ciclo do duelo persistido e placar revelado só no fim (187 testes) | Fila de código da Fase 1 vazia — segue com L-03 e L-06 |
 | 2026-08-20 | C-07: chat do duelo por WebSocket, com ticket, histórico curto e limite por conta (166 testes) | C-09 (votação simples) |
 | 2026-08-20 | C-37: conta nativa com senha, verificação de e-mail e recuperação — OAuth virou atalho (D-19) | C-07 (chat) — e L-17, L-18 do lado do Leonardo |
 | 2026-08-20 | C-02: login por OAuth, sessão em cookie, perfil mínimo, Prisma e hospedagem escolhida (96 testes) | C-07 (chat) — e L-17 do lado do Leonardo |
