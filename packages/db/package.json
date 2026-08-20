@@ -1,0 +1,10 @@
+{
+  "name": "@trendi/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Schema e migrations do PostgreSQL",
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.2.17"
+  }
+}

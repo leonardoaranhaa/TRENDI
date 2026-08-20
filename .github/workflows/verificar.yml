@@ -37,3 +37,27 @@ jobs:
 
       - name: Estado da sincronia com o Projeto
         run: ./sync/projeto.sh >> "$GITHUB_STEP_SUMMARY"
+
+  codigo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tipos (pacotes, apps e testes)
+        run: npm run typecheck
+
+      - name: Tipos (cliente web)
+        run: npm run typecheck:web
+
+      - name: Testes
+        run: npm test
+
+      - name: Build do cliente web
+        run: npm run build -w @trendi/web

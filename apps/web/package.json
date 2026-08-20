@@ -1,0 +1,24 @@
+{
+  "name": "@trendi/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Cliente web: est\u00e1dio, chats, vota\u00e7\u00e3o, capta\u00e7\u00e3o WebRTC",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@trendi/shared": "*",
+    "next": "^16.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

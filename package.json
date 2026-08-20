@@ -1,0 +1,29 @@
+{
+  "name": "trendi",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Plataforma de duelos ao vivo entre criadores",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc --build && tsc -p tsconfig.tests.json",
+    "typecheck:web": "npm run typecheck -w @trendi/web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run typecheck && npm run build -w @trendi/web",
+    "dev:api": "npm run dev -w @trendi/api",
+    "dev:realtime": "npm run dev -w @trendi/realtime",
+    "dev:web": "npm run dev -w @trendi/web",
+    "clean": "tsc --build --clean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
