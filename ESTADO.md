@@ -2,8 +2,8 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** [preencher — data]
-**Fase atual:** Fase 0 — Definição
+**Última atualização:** 2026-08-20
+**Fase atual:** Fase 0 — Definição *(com a frente técnica da Fase 1 correndo em paralelo, pelo que não depende de bloqueio)*
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
 ---
@@ -17,6 +17,10 @@ O que está sendo trabalhado agora:
 | L-01 | Verificar disponibilidade do nome TRENDI | Leonardo | ⬜ |
 | L-02 | Consulta jurídica (monetização, biometria, música) | Leonardo | ⬜ |
 | L-03 | Pesquisa e escolha do fornecedor de vídeo | Leonardo | ⬜ |
+| C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
+| C-08 | Máquina de estados do duelo | Claude Code | ✅ |
+| C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
+| C-02 | Identidade: cadastro, login, perfil mínimo | Claude Code | ⬜ próxima |
 
 ---
 
@@ -24,7 +28,7 @@ O que está sendo trabalhado agora:
 
 | Bloqueio | Trava o quê | Como destravar |
 |---|---|---|
-| L-03 pendente | Toda a camada de vídeo (C-03 a C-07) | Rodar a pesquisa comparativa de fornecedores |
+| L-03 pendente | Toda a camada de vídeo (C-03 a C-06, e C-21) | Rodar a pesquisa comparativa de fornecedores |
 | L-02 pendente | Monetização e verificação etária | Contratar consulta jurídica |
 | L-05 pendente | Pagamentos e contratos | Abrir CNPJ |
 
@@ -41,15 +45,18 @@ O que está sendo trabalhado agora:
 
 ## PRÓXIMOS 3 PASSOS
 
-1. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual.
-2. **L-03** — pesquisa de fornecedor de vídeo. É o bloqueio mais pesado: sem isso, nenhuma linha de código de vídeo faz sentido.
+1. **L-03** — pesquisa de fornecedor de vídeo. Continua o bloqueio mais pesado: C-03 a C-07 dependem dele, e agora é ele que separa o repositório de um duelo real.
+2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
+
+Do lado do código, sem depender de nenhum dos três: **C-02** (identidade) e
+**C-07** (chat por WebSocket) já podem andar.
 
 ---
 
 ## MÉTRICAS DA FASE ATUAL
 
-Fase 0 não tem métrica de produto. O portão de saída é:
+Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende de código):
 - [ ] Nome confirmado e registrado
 - [ ] Fornecedor de vídeo escolhido
 - [ ] Parecer jurídico recebido
@@ -64,4 +71,6 @@ Fase 0 não tem métrica de produto. O portão de saída é:
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-01, C-08 e a fórmula do voto cruzado: monorepo, API, tempo real, cliente web, schema e 41 testes | C-02 (identidade) ou C-07 (chat) |
+| 2026-08-20 | Cérebro no repo, sincronia com o Projeto e ambiente do Claude Code | Começar a construção pela C-01 |
 | — | Cérebro do projeto criado | Começar por L-01 |

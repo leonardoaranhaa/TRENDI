@@ -92,6 +92,62 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 ---
 
+## D-10 — Código em inglês, cérebro em português, com mapa entre os dois
+**Data:** 2026-08-20 **Status:** travada
+
+**Decisão:** tabelas, tipos e funções em inglês, como manda `02-arquitetura/convencoes.md`. O cérebro continua em português. A tradução dos termos do domínio fica registrada em dois lugares que ninguém precisa procurar: `packages/shared/src/domain.ts` e a tabela de nomes em `packages/db/README.md`.
+
+**Por quê:** `02-arquitetura/modelo-de-dados.md` descreve as entidades em português (`voto_resultado`, `arquibancada`), e a convenção manda escrever em inglês. Sem um mapa explícito, cada tarefa reinventaria a tradução — `stand`, `bleacher`, `crowd` — e a busca por um termo pararia de funcionar.
+
+**Descartado:** tabelas em português, que casaria com o cérebro mas brigaria com toda biblioteca; e traduzir o cérebro, que é onde o Leonardo pensa.
+
+---
+
+## D-11 — O cérebro fica na raiz do repositório, não em `/docs`
+**Data:** 2026-08-20 **Status:** travada
+
+**Decisão:** `01-conceito/` a `06-registro/` e o `ESTADO.md` ficam na raiz. O `/docs` previsto em `convencoes.md` não existe.
+
+**Por quê:** mover o cérebro para `/docs` quebraria `sync/projeto.manifest`, os caminhos do `CLAUDE.md`, os hooks e os comandos — tudo isso por um ganho estético. O `convencoes.md` foi corrigido para descrever o que é verdade.
+
+---
+
+## D-12 — Máquina de estados: as duas leituras que o arquivo de regras não fixa
+**Data:** 2026-08-20 **Status:** travada
+
+**Decisão:** duas lacunas de `01-conceito/regras-do-duelo.md` §1 resolvidas assim:
+
+1. **Pareamento não aceito em 60s cancela o duelo.** Quem ainda quiser duelar volta para a fila num duelo novo. A alternativa — voltar de PAREADO para FILA — violaria a unidirecionalidade, que é o que torna a auditoria confiável.
+2. **Desistência conta do ACEITE até a EXECUÇÃO.** Depois que a EXECUÇÃO termina, o criador que fecha a aba não interrompe nada: a votação segue e o resultado sai. Por isso o evento de abandono nem é aceito em VOTAÇÃO.
+
+**Por quê:** o arquivo diz "sair depois do ACEITE é desistência, sempre". Ao pé da letra, fechar a aba durante a apuração puniria alguém por um duelo que já aconteceu por inteiro — punição sem dano.
+
+**Custo da decisão:** se a intenção original era punir também nesse caso, muda uma linha em `packages/shared/src/duel-state.ts` e o teste que a cobre.
+
+---
+
+## D-13 — Sem ORM e sem runner de migration por enquanto
+**Data:** 2026-08-20 **Status:** em revisão (rever em C-02)
+
+**Decisão:** o schema são arquivos `.sql` numerados em `packages/db/migrations/`, aplicados com `psql`. Nenhum ORM escolhido.
+
+**Por quê:** escolher Prisma ou Drizzle agora seria decidir sem uso real — `C-02` é a primeira tarefa que escreve consulta de verdade, e é lá que a escolha se paga ou se paga caro. Enquanto isso, SQL puro não trava nada.
+
+**Como isso não vira dívida silenciosa:** os testes aplicam todas as migrations num Postgres em memória (PGlite) a cada `npm test`. SQL quebrado não passa de PR.
+
+---
+
+## D-14 — Stack concretizada: Fastify, Next 16, npm workspaces, Vitest
+**Data:** 2026-08-20 **Status:** travada (a camada de vídeo continua aberta em L-03)
+
+**Decisão:** dos "ou" que `02-arquitetura/stack.md` deixava em aberto: **Fastify** (não NestJS), **`ws`** puro no servidor de tempo real (não Socket.io), **npm workspaces** (não pnpm ou Turborepo), **Vitest** como runner.
+
+**Por quê:** projeto solo. Fastify e `ws` cabem na cabeça inteiros; NestJS cobra estrutura antes de existir tamanho que justifique. npm workspaces já vem instalado. Vitest roda TypeScript sem etapa de build.
+
+**Next 16, não 15:** o 15 entra com três vulnerabilidades altas herdadas de `sharp`. Em projeto novo não há custo de migração.
+
+**O que continua em aberto:** vídeo (`L-03`), hospedagem e Postgres gerenciado (`L-05`), ORM (`D-13`).
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

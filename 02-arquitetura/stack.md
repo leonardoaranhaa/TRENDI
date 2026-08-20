@@ -1,14 +1,18 @@
 # STACK TÉCNICA
 
-> Proposta inicial. Ajustar conforme o fornecedor de vídeo escolhido em L-03.
+> O que está em **negrito** já está montado e rodando (C-01). O resto segue
+> proposta — e a camada de vídeo continua travada em L-03.
+
+Monorepo com npm workspaces, TypeScript em modo estrito, Vitest como runner.
+Ver decisão D-14.
 
 ## Frontend
 
 | Item | Escolha | Motivo |
 |---|---|---|
-| Framework | Next.js (React) | SSR para SEO dos clipes e perfis; ecossistema maduro |
-| Estilo | Tailwind | Velocidade de iteração |
-| Tempo real | WebSocket nativo ou Socket.io | Chat, barulhômetro, estado do duelo |
+| Framework | **Next.js 16** (React 19) | SSR para SEO dos clipes e perfis; ecossistema maduro |
+| Estilo | **Tailwind 4** | Velocidade de iteração |
+| Tempo real | **`ws`** (WebSocket nativo) | Chat, barulhômetro, estado do duelo. Socket.io descartado em D-14 |
 | Vídeo | SDK do fornecedor escolhido | Depende de L-03 |
 
 ## Backend
@@ -16,7 +20,7 @@
 | Item | Escolha | Motivo |
 |---|---|---|
 | Runtime | Node.js (TypeScript) | Mesma linguagem do frontend — crítico para dev solo |
-| API | Fastify ou NestJS | Fastify se prioridade é simplicidade; NestJS se estrutura |
+| API | **Fastify** | Escolhido em D-14: cabe na cabeça inteiro |
 | Tempo real | Servidor WebSocket dedicado | Isolar carga de chat da API |
 | Fila | BullMQ sobre Redis | Matchmaking, renderização de clipes, moderação |
 

@@ -13,13 +13,18 @@ Motivo: código em inglês por convenção universal e compatibilidade com bibli
 ```
 /apps
   /web          ← Next.js
-  /api          ← backend HTTP
-  /realtime     ← servidor WebSocket
+  /api          ← backend HTTP (Fastify)
+  /realtime     ← servidor WebSocket (ws)
 /packages
   /shared       ← tipos, constantes, fórmulas compartilhadas
   /db           ← schema e migrations
-/docs           ← este cérebro
+/sync           ← sincronia com o Projeto do Claude
 ```
+
+O cérebro (`ESTADO.md`, `01-conceito/` … `06-registro/`) fica na **raiz**, não
+em `/docs` — ver decisão D-11.
+
+Monorepo com npm workspaces. Um `npm install` na raiz resolve tudo.
 
 ## Regras não negociáveis
 
@@ -49,6 +54,15 @@ Prioridade para projeto solo — testar só o que quebra silenciosamente e custa
 4. Normalização do barulhômetro
 
 Interface e fluxo visual: teste manual é suficiente na fase inicial.
+
+```bash
+npm test           # tudo: fórmula, máquina de estados, API, tempo real, migrations
+npm run typecheck  # pacotes, apps e os próprios testes
+```
+
+Os testes ficam ao lado do código que testam (`src/**/*.test.ts`). As
+migrations rodam num Postgres em memória a cada `npm test`: SQL quebrado não
+passa de PR.
 
 ## Ao concluir tarefa
 

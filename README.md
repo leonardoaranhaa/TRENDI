@@ -123,6 +123,31 @@ Detalhes de permissões, MCP e o que ainda não está ligado (e por quê): `02-a
 
 ---
 
+## COMO RODAR O CÓDIGO
+
+Monorepo com npm workspaces. Node 22 (`.nvmrc`).
+
+```bash
+npm install          # uma vez, na raiz
+npm test             # fórmula, máquina de estados, API, tempo real e migrations
+npm run typecheck    # pacotes, apps e testes
+npm run dev:web      # cliente em http://localhost:3000
+npm run dev:api      # API em http://localhost:3001
+npm run dev:realtime # WebSocket em ws://localhost:3002
+```
+
+| Pasta | O que é |
+|---|---|
+| `packages/shared` | Regras do duelo: voto cruzado e máquina de estados. Um lugar só, com teste. |
+| `packages/db` | Schema em SQL e as migrations |
+| `apps/api` | API HTTP (Fastify) |
+| `apps/realtime` | Servidor WebSocket (`ws`) |
+| `apps/web` | Cliente (Next.js) |
+
+O que está montado e o que ainda não: `02-arquitetura/stack.md` e o backlog.
+
+---
+
 ## FLUXO DE TRABALHO
 
 ```

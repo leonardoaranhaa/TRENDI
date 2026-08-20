@@ -27,14 +27,14 @@
 
 | ID | Tarefa | Exec | Status | Depende de |
 |---|---|---|---|---|
-| C-01 | Montar repositório, stack base, convenções | C | ⬜ | — |
+| C-01 | Montar repositório, stack base, convenções | C | ✅ | — |
 | C-02 | Identidade: cadastro, login, perfil mínimo | C | ⬜ | C-01 |
 | C-03 | Integrar SDK do fornecedor de vídeo | C | 🔴 | **L-03** |
 | C-04 | Captação WebRTC do navegador (sem download) | C | ⬜ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ⬜ | C-04 |
 | C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
 | C-07 | Chat único por WebSocket | C | ⬜ | C-01 |
-| C-08 | Máquina de estados do duelo | C | ⬜ | C-01 |
+| C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ⬜ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | L-06 |
 
@@ -42,12 +42,16 @@
 
 ## FASE 2 — MVP PRIVADO
 
+> `C-14` está 🟡: a fórmula e os casos-limite estão em `packages/shared/src/cross-vote.ts`
+> com teste para cada linha da tabela do arquivo de regras. Falta plugar no
+> serviço de votação (`C-09`) e nas arquibancadas travadas (`C-12`).
+
 | ID | Tarefa | Exec | Status | Depende de |
 |---|---|---|---|---|
 | C-11 | Três chats com escrita restrita ao próprio lado | C | ⬜ | C-07 |
 | C-12 | Sistema de arquibancadas e travamento na votação | C | ⬜ | C-11 |
 | C-13 | Barulhômetro: coleta, normalização, publicação | C | ⬜ | C-12 |
-| C-14 | Voto cruzado completo com todos os casos-limite | C | ⬜ | C-09, C-12 |
+| C-14 | Voto cruzado completo com todos os casos-limite | C | 🟡 | C-09, C-12 |
 | C-15 | Antifraude de voto | C | ⬜ | C-14 |
 | C-16 | Fila e matchmaking por faixa de audiência | C | ⬜ | C-08 |
 | C-17 | Penalidade progressiva e reabilitação | C | ⬜ | C-16, L-09 |
