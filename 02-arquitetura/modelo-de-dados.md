@@ -6,10 +6,22 @@ Entidades principais. Detalhamento de colunas fica a cargo da implementação.
 
 ```
 usuario
-  id, handle, email, telefone, criado_em
-  idade_estimada, idade_verificada_em, faixa_etaria
+  id, handle, email (pode ser nulo), nome_de_exibicao, avatar_url
   papel: espectador | criador
   status: ativo | suspenso | banido
+  criado_em, atualizado_em
+
+  Sem senha: login é só por OAuth (D-15).
+  Sem idade e sem biometria enquanto C-24 estiver travada em L-08 → L-02.
+  Os campos de idade entram lá, não antes.
+
+conta_provedor  (OAuth — tabela `accounts`)
+  id, usuario_id, provedor (google|discord), id_no_provedor
+  único: (provedor, id_no_provedor) — é a chave da identidade, não o e-mail
+
+sessao  (tabela `sessions`)
+  id, usuario_id, hash_do_token, expira_em, criado_em
+  O token em si nunca é guardado. Ver decisão D-16.
 
 criador  (extensão de usuario)
   audiencia_media, duelos_totais, vitorias, derrotas
@@ -99,6 +111,8 @@ clipe
 ## Índices que importam
 
 - `voto_resultado(duelo_id, usuario_id)` — único, é a garantia de 1 voto por conta
+- `accounts(provedor, id_no_provedor)` — único, é o que faz o segundo login achar a conta
+- `sessions(hash_do_token)` — único, é por onde toda requisição autenticada passa
 - `presenca(duelo_id, usuario_id)` — único
 - `duelo(estado)` — consulta constante para duelos ao vivo
 - `sinal_barulho(duelo_id, janela_ts)` — série temporal do barulhômetro

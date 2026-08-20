@@ -47,6 +47,12 @@ L-01 (nome)
 ```
 
 ```
+L-17 (apps OAuth registrados)
+  └─→ entrar com conta real (C-02 já roda com provedor falso)
+        └─→ C-36 (publicar o protótipo)
+```
+
+```
 L-06 (regras dos desafios)
   ├─→ C-10 (desafio da fase 1)
   ├─→ C-20 (catálogo fase 2)
@@ -59,14 +65,14 @@ L-06 (regras dos desafios)
 
 Se você quiser codar hoje e nenhum `[L]` estiver resolvido, estas tarefas não dependem de nada externo:
 
-- **C-01** montar repositório e stack
-- **C-02** identidade e login
+- ~~**C-01** montar repositório e stack~~ ✅
+- ~~**C-02** identidade e login~~ ✅ (entra de verdade só com L-17)
 - **C-07** chat por WebSocket
-- **C-08** máquina de estados do duelo
+- ~~**C-08** máquina de estados do duelo~~ ✅
 - **C-09** votação simples
-- **C-14** fórmula do voto cruzado (é matemática pura, testável isolada)
+- **C-14** fórmula do voto cruzado — 🟡 a fórmula está pronta e testada; falta plugar em C-09 e C-12
 
-**Sugestão de sequência inicial:** C-01 → C-08 → C-14 → C-07. Isso constrói o coração lógico da plataforma enquanto L-03 e L-02 correm em paralelo no mundo real.
+**Sequência inicial:** C-01 → C-08 → C-14 → C-02. O coração lógico está de pé. O próximo passo sem bloqueio é **C-07** (chat) e depois **C-09** (votação), que já tem identidade para garantir uma conta, um voto.
 
 ---
 
@@ -79,3 +85,4 @@ Se você quiser codar hoje e nenhum `[L]` estiver resolvido, estas tarefas não 
 | Coletar biometria antes de L-02 | Exposição jurídica séria — categoria mais sensível do projeto |
 | Construir ranking antes de validar o formato (Fase 1) | Trabalho perdido se o formato não engajar |
 | Deixar moderação para depois com chats expostos | Primeiro duelo tóxico queima a reputação |
+| Descobrir tarde que app OAuth leva dias para aprovar | Ninguém entra na plataforma no dia do teste com criador |

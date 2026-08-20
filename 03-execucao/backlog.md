@@ -28,7 +28,7 @@
 | ID | Tarefa | Exec | Status | Depende de |
 |---|---|---|---|---|
 | C-01 | Montar repositório, stack base, convenções | C | ✅ | — |
-| C-02 | Identidade: cadastro, login, perfil mínimo | C | ⬜ | C-01 |
+| C-02 | Identidade: cadastro, login, perfil mínimo | C | ✅ | C-01 |
 | C-03 | Integrar SDK do fornecedor de vídeo | C | 🔴 | **L-03** |
 | C-04 | Captação WebRTC do navegador (sem download) | C | ⬜ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ⬜ | C-04 |
@@ -37,6 +37,12 @@
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ⬜ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | L-06 |
+| L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
+| C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
+
+> `C-02` está construída e testada com um provedor falso. Para alguém entrar
+> com a conta de verdade falta `L-17` — registrar os apps e colocar as
+> credenciais no ambiente. Nada de código depende disso.
 
 ---
 

@@ -23,6 +23,8 @@ Ver decisão D-14.
 | API | **Fastify** | Escolhido em D-14: cabe na cabeça inteiro |
 | Tempo real | Servidor WebSocket dedicado | Isolar carga de chat da API |
 | Fila | BullMQ sobre Redis | Matchmaking, renderização de clipes, moderação |
+| Identidade | **OAuth (Google e Discord) com `arctic`** | Sem senha para guardar — decisão D-15 |
+| Sessão | **Token opaco em cookie httpOnly** | Revogável na hora; hash no banco — decisão D-16 |
 
 **Por que TypeScript em tudo:** projeto solo não comporta troca de contexto entre linguagens. Tipos compartilhados entre cliente e servidor eliminam uma classe inteira de bugs.
 
@@ -30,19 +32,22 @@ Ver decisão D-14.
 
 | Item | Uso |
 |---|---|
-| **PostgreSQL** | Usuários, duelos, votos consolidados, ranking, financeiro |
+| **PostgreSQL** (via **Prisma**) | Usuários, duelos, votos consolidados, ranking, financeiro. Schema em D-18 |
 | **Redis** | Fila de matchmaking, contagem de votos em tempo real, barulhômetro, limitação de taxa, presença |
 | **Object Storage (S3 ou equivalente)** | Gravações, clipes, assets |
 | **CDN** | Vídeo e clipes |
 
 ## Infraestrutura
 
-| Item | Escolha inicial |
+| Item | Escolha |
 |---|---|
-| Hospedagem de app | Vercel (frontend) + serviço de container para backend |
-| Banco | Postgres gerenciado |
+| Cliente web | **Vercel** |
+| API e tempo real | **Fly.io**, região no Brasil — a Vercel não segura WebSocket |
+| Banco | **Supabase** (São Paulo), só o Postgres |
 | Vídeo | **Pendente — L-03** |
 | Observabilidade | Logs estruturados + monitoramento de erro desde o dia 1 |
+
+Ver decisão D-17 para o porquê de cada uma e o que conferir antes de contratar.
 
 **Regra para projeto solo:** preferir sempre serviço gerenciado a self-hosted, mesmo custando mais. Seu recurso escasso é tempo, não dinheiro de infraestrutura.
 

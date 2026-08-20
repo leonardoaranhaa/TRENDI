@@ -20,7 +20,9 @@ O que está sendo trabalhado agora:
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
-| C-02 | Identidade: cadastro, login, perfil mínimo | Claude Code | ⬜ próxima |
+| C-02 | Identidade: cadastro, login, perfil mínimo | Claude Code | ✅ (entra de verdade só com L-17) |
+| L-17 | Registrar apps OAuth no Google e no Discord | Leonardo | ⬜ **nova** |
+| C-07 | Chat único por WebSocket | Claude Code | ⬜ próxima |
 
 ---
 
@@ -31,11 +33,13 @@ O que está sendo trabalhado agora:
 | L-03 pendente | Toda a camada de vídeo (C-03 a C-06, e C-21) | Rodar a pesquisa comparativa de fornecedores |
 | L-02 pendente | Monetização e verificação etária | Contratar consulta jurídica |
 | L-05 pendente | Pagamentos e contratos | Abrir CNPJ |
+| L-17 pendente | Entrar com conta real (Google/Discord) e publicar o protótipo (C-36) | Registrar os apps e guardar client id/secret |
 
 ---
 
 ## DECISÕES AGUARDANDO LEONARDO
 
+0. Registrar os apps OAuth (L-17) — sem isso ninguém entra com conta real
 1. Confirmar nome definitivo após L-01
 2. Escolher fornecedor de infraestrutura de vídeo após L-03
 3. Definir se haverá prêmio em dinheiro (recomendação atual: não no lançamento)
@@ -49,8 +53,13 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-Do lado do código, sem depender de nenhum dos três: **C-02** (identidade) e
-**C-07** (chat por WebSocket) já podem andar.
+Do lado do código, sem depender de nenhum dos três: **C-07** (chat por
+WebSocket) e depois **C-09** (votação simples), que já tem identidade para
+garantir uma conta, um voto.
+
+**L-17** entrou na lista: registrar os apps de OAuth. É rápido, e é o que
+separa "dá para entrar com provedor de teste" de "dá para entrar com a sua
+conta do Discord".
 
 ---
 
@@ -71,6 +80,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-02: login por OAuth, sessão em cookie, perfil mínimo, Prisma e hospedagem escolhida (96 testes) | C-07 (chat) — e L-17 do lado do Leonardo |
 | 2026-08-20 | C-01, C-08 e a fórmula do voto cruzado: monorepo, API, tempo real, cliente web, schema e 41 testes | C-02 (identidade) ou C-07 (chat) |
 | 2026-08-20 | Cérebro no repo, sincronia com o Projeto e ambiente do Claude Code | Começar a construção pela C-01 |
 | — | Cérebro do projeto criado | Começar por L-01 |

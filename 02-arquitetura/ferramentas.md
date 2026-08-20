@@ -24,6 +24,8 @@ Continua perguntando: `git push` (é o que sai do seu computador), edição de `
 
 Negado: editar `sync/projeto.lock` na mão — quem escreve é `./sync/projeto.sh mark`. E ler `.env`.
 
+> A regra `Read(./.env.*)` também pega `.env.example`, que não tem segredo nenhum. Por isso o arquivo de exemplo se chama `env.exemplo`. Se quiser o nome de sempre, troque a regra por `Read(./.env)` mais `Read(./.env.local)` e renomeie.
+
 Para afrouxar ou apertar, edite `.claude/settings.json` ou rode `/permissions`. Preferências suas, que não valem para o repo, vão em `.claude/settings.local.json` (ignorado pelo git).
 
 ---

@@ -127,7 +127,7 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 ---
 
 ## D-13 — Sem ORM e sem runner de migration por enquanto
-**Data:** 2026-08-20 **Status:** em revisão (rever em C-02)
+**Data:** 2026-08-20 **Status:** revista em C-02 — ver D-18
 
 **Decisão:** o schema são arquivos `.sql` numerados em `packages/db/migrations/`, aplicados com `psql`. Nenhum ORM escolhido.
 
@@ -147,6 +147,60 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 **Next 16, não 15:** o 15 entra com três vulnerabilidades altas herdadas de `sharp`. Em projeto novo não há custo de migração.
 
 **O que continua em aberto:** vídeo (`L-03`), hospedagem e Postgres gerenciado (`L-05`), ORM (`D-13`).
+
+---
+
+## D-15 — Login só por OAuth, sem senha
+**Data:** 2026-08-20 **Status:** travada
+
+**Decisão:** entra-se na TRENDI por Google ou Discord. Não existe cadastro com senha.
+
+**Por quê:** senha que não existe não vaza, não precisa de política, de recuperação, nem de rate limit em tela de esqueci-minha-senha. O público-alvo já tem as duas contas — Discord é onde a comunidade de criador vive. E a identidade fica sendo a conta do provedor, não o e-mail: e-mail muda, pode vir vazio no Discord, e casar contas por e-mail entrega a conta de alguém para quem registrou o mesmo endereço em outro serviço.
+
+**Descartado:** link mágico por e-mail (depende de domínio próprio, que pende de L-01, e de provedor de envio); senha (superfície de risco sem ganho).
+
+**Custo da decisão:** dependência de terceiro para entrar. Se o Discord cair, ninguém novo entra — quem já tem sessão continua. E exige registrar os apps nos dois provedores, que virou a tarefa L-17.
+
+**Consequência no código:** `users` não tem coluna de senha, e um teste garante que continue assim.
+
+---
+
+## D-16 — Sessão opaca em cookie, com hash no banco
+**Data:** 2026-08-20 **Status:** travada
+
+**Decisão:** ao entrar, o servidor sorteia 32 bytes, guarda **só o hash SHA-256** e devolve o token num cookie `httpOnly`, `SameSite=Lax`, com 30 dias e renovação deslizante.
+
+**Por quê:** dump de banco vazado não vira sessão de ninguém. Comparado a JWT, a sessão opaca pode ser revogada na hora — banir alguém no meio de um duelo precisa ter efeito imediato, e token autoassinado só morre quando vence.
+
+**Consequência de arquitetura:** cookie não atravessa domínio diferente em conexão `wss://`. Então o servidor de tempo real não usa o cookie: quem tem sessão pede à API um **ticket assinado de 60 segundos** e apresenta na conexão. O ticket vive em `@trendi/shared/realtime-ticket` e é conferido sem consultar banco, que é o que aguenta sala cheia entrando de uma vez.
+
+---
+
+## D-17 — Hospedagem: Vercel, Fly.io e Supabase
+**Data:** 2026-08-20 **Status:** travada (a camada de vídeo segue aberta em L-03)
+
+**Decisão:** cliente Next na **Vercel**; API e servidor de tempo real na **Fly.io**, em região no Brasil; Postgres no **Supabase** (São Paulo), usando só o banco.
+
+**Por quê:** a Vercel não segura WebSocket — função serverless não mantém conexão viva, e chat, barulhômetro e estado do duelo são conexão longa. Então o backend precisa de processo sempre ligado, e a Fly dá isso com região perto do público, que é o que a votação e o barulhômetro sentem. O banco fica junto da API, não junto do site: quem conversa com o banco é a API.
+
+**Descartado:** tudo na Vercel com Ably ou Pusher para o tempo real (custo por mensagem, justo onde o volume é alto, e a normalização do barulhômetro sairia do nosso controle); Cloud Run (WebSocket com teto por conexão); Railway e Render (sem região no Brasil).
+
+**Consequência no código:** `/api/*` no cliente é reescrito para a API, o que mantém o cookie de sessão como cookie de primeira parte enquanto não existe domínio próprio (L-01). O WebSocket não passa por esse rewrite — vai direto, com o ticket da D-16.
+
+**A conferir antes de contratar:** o plano Hobby da Vercel é para projeto não comercial, e a TRENDI em algum momento vira Pro. A máquina da Fly não pode dormir. E confira o código de região disponível na sua conta.
+
+---
+
+## D-18 — Prisma como fonte da verdade do schema
+**Data:** 2026-08-20 **Status:** travada (revisa a D-13)
+
+**Decisão:** `packages/db/prisma/schema.prisma` descreve o banco. As migrations continuam sendo `.sql` numerado, escrito à mão e aplicável com `psql`.
+
+**Por quê:** C-02 foi a primeira tarefa a escrever consulta de verdade, que era o gatilho combinado na D-13. Tipo derivado do schema paga o próprio custo já no primeiro `findUnique`, e o Prisma 7 fala com o Postgres por adapter, sem engine binária no meio.
+
+**O que impede as duas metades divergirem:** um teste roda `prisma migrate diff` entre o banco criado pelas migrations e o schema. Diferença reprova o PR. Foi ele que pegou, no primeiro dia, que as chaves estrangeiras escritas à mão não tinham a mesma ação de referência que o Prisma esperava.
+
+**Descartado:** deixar o Prisma gerar as migrations (exige banco sombra e tira a legibilidade do SQL); Drizzle (schema em TypeScript, duplicando o que o `.sql` já diz).
 
 ## MODELO PARA NOVAS DECISÕES
 
