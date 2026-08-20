@@ -73,12 +73,12 @@ Se você quiser codar hoje e nenhum `[L]` estiver resolvido, estas tarefas não 
 
 - ~~**C-01** montar repositório e stack~~ ✅
 - ~~**C-02** identidade e login~~ ✅ (entra de verdade só com L-17)
-- **C-07** chat por WebSocket
+- ~~**C-07** chat por WebSocket~~ ✅
 - ~~**C-08** máquina de estados do duelo~~ ✅
 - **C-09** votação simples
 - **C-14** fórmula do voto cruzado — 🟡 a fórmula está pronta e testada; falta plugar em C-09 e C-12
 
-**Sequência inicial:** C-01 → C-08 → C-14 → C-02. O coração lógico está de pé. O próximo passo sem bloqueio é **C-07** (chat) e depois **C-09** (votação), que já tem identidade para garantir uma conta, um voto.
+**Sequência inicial:** C-01 → C-08 → C-14 → C-02 → C-37 → C-07. O coração lógico está de pé, com identidade e chat. O próximo passo sem bloqueio é **C-09** (votação simples), que já tem identidade para garantir uma conta, um voto, e máquina de estados para saber quando a janela abre e fecha.
 
 ---
 

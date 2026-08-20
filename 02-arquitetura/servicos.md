@@ -5,7 +5,7 @@
 | **Identidade** | Cadastro, login, verificação de idade, perfis | 1 |
 | **Duelo** | Máquina de estados: fila → aceite → escolha → execução → votação → resultado | 1 |
 | **Mídia** | Integração com fornecedor: criar sala, ingestão, composição, gravação | 1 |
-| **Chat** | WebSocket, três salas por duelo, regra de leitura total e escrita restrita | 1 |
+| **Chat** | WebSocket, três salas por duelo, regra de leitura total e escrita restrita | 1 · *sala única entregue em C-07; as três chegam em C-11* |
 | **Votação** | Recebe votos, aplica pesos cruzados, normaliza, antifraude | 1 |
 | **Matchmaking** | Fila, pareamento por faixa, prioridade e penalidade | 2 |
 | **Barulhômetro** | Agrega sinais por lado, normaliza por tamanho de torcida, publica em tempo real | 2 |

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Servidor WebSocket: chat, barulhômetro, estado do duelo",
+  "description": "Servidor WebSocket: chat, barulh\u00f4metro, estado do duelo",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc --build",
@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@trendi/shared": "*",
-    "ws": "^8.18.0"
+    "ws": "^8.18.0",
+    "@trendi/db": "*"
   },
   "devDependencies": {
     "@types/ws": "^8.5.13"

@@ -24,7 +24,8 @@ O que está sendo trabalhado agora:
 | C-37 | Conta nativa: cadastro, login, verificação, recuperação | Claude Code | ✅ **nova** |
 | L-17 | Registrar apps OAuth no Google e no Discord | Leonardo | ⬜ |
 | L-18 | Contratar provedor de e-mail transacional | Leonardo | ⬜ **nova** |
-| C-07 | Chat único por WebSocket | Claude Code | ⬜ próxima |
+| C-07 | Chat único por WebSocket | Claude Code | ✅ |
+| C-09 | Votação simples (sem peso cruzado) | Claude Code | ⬜ próxima |
 
 ---
 
@@ -56,9 +57,9 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-Do lado do código, sem depender de nenhum dos três: **C-07** (chat por
-WebSocket) e depois **C-09** (votação simples), que já tem identidade para
-garantir uma conta, um voto.
+Do lado do código, sem depender de nenhum dos três: **C-09** (votação
+simples), que já tem identidade para garantir uma conta, um voto, e máquina de
+estados para saber quando a janela abre e fecha.
 
 Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
 OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
@@ -84,6 +85,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-07: chat do duelo por WebSocket, com ticket, histórico curto e limite por conta (166 testes) | C-09 (votação simples) |
 | 2026-08-20 | C-37: conta nativa com senha, verificação de e-mail e recuperação — OAuth virou atalho (D-19) | C-07 (chat) — e L-17, L-18 do lado do Leonardo |
 | 2026-08-20 | C-02: login por OAuth, sessão em cookie, perfil mínimo, Prisma e hospedagem escolhida (96 testes) | C-07 (chat) — e L-17 do lado do Leonardo |
 | 2026-08-20 | C-01, C-08 e a fórmula do voto cruzado: monorepo, API, tempo real, cliente web, schema e 41 testes | C-02 (identidade) ou C-07 (chat) |
