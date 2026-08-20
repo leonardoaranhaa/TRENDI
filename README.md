@@ -74,7 +74,8 @@ trendi/
 │   ├── stack.md
 │   ├── modelo-de-dados.md
 │   ├── servicos.md
-│   └── convencoes.md
+│   ├── convencoes.md
+│   └── ferramentas.md          ← permissões, hooks, MCP: como o Claude Code opera aqui
 │
 ├── 03-execucao/
 │   ├── roadmap.md              ← fases e portões de validação
@@ -94,11 +95,31 @@ trendi/
 │   ├── decisoes.md             ← decisão, data, motivo
 │   └── aprendizados.md         ← o que a realidade ensinou
 │
-└── sync/
-    ├── projeto.manifest        ← quais arquivos também vivem no Projeto
-    ├── projeto.sh              ← o que re-subir, e o pacote pronto
-    └── projeto.lock            ← hashes do último upload (criado pelo `mark`)
+├── sync/
+│   ├── projeto.manifest        ← quais arquivos também vivem no Projeto
+│   ├── projeto.sh              ← o que re-subir, e o pacote pronto
+│   └── projeto.lock            ← hashes do último upload (criado pelo `mark`)
+│
+├── .claude/                    ← configuração do Claude Code (permissões, hooks, comandos)
+├── .mcp.json                   ← servidores MCP do projeto
+└── .github/workflows/          ← verificação automática em cada PR
 ```
+
+---
+
+## O AMBIENTE DE TRABALHO
+
+O repo vem configurado para o Claude Code operar sozinho: ao abrir a sessão, um hook injeta a fase, a frente ativa, os bloqueios e o que está fora de sincronia — você não precisa mandar ler o `ESTADO.md`. Ao fim de cada resposta, outro hook avisa se algum arquivo do Projeto ficou desatualizado.
+
+Três comandos cobrem o fluxo:
+
+| Comando | Para quê |
+|---|---|
+| `/estado` | Onde estamos, o que está desbloqueado, o que está travado |
+| `/tarefa C-01` | Executa uma tarefa do backlog, recusando as que têm bloqueio aberto |
+| `/fechar` | Encerramento: backlog, ESTADO, decisões, sincronia |
+
+Detalhes de permissões, MCP e o que ainda não está ligado (e por quê): `02-arquitetura/ferramentas.md`.
 
 ---
 

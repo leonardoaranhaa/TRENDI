@@ -1,0 +1,39 @@
+name: verificar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  sincronia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sintaxe dos scripts
+        run: |
+          bash -n sync/projeto.sh
+          bash -n .claude/hooks/estado.sh
+          bash -n .claude/hooks/lembrete-sync.sh
+
+      - name: Configuração é JSON válido
+        run: |
+          jq -e . .claude/settings.json > /dev/null
+          jq -e . .mcp.json > /dev/null
+
+      - name: Manifesto íntegro (arquivos existem, nomes únicos)
+        run: ./sync/projeto.sh list
+
+      - name: Pacote do Projeto monta
+        run: |
+          ./sync/projeto.sh build
+          test "$(ls dist/projeto | wc -l)" = "$(./sync/projeto.sh list | wc -l)"
+
+      - name: Hooks rodam sem erro
+        run: |
+          echo '{"session_id":"ci","source":"startup"}' | ./.claude/hooks/estado.sh > /dev/null
+          echo '{"session_id":"ci"}' | ./.claude/hooks/lembrete-sync.sh > /dev/null
+
+      - name: Estado da sincronia com o Projeto
+        run: ./sync/projeto.sh >> "$GITHUB_STEP_SUMMARY"

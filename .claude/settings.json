@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(./sync/projeto.sh)",
+      "Bash(./sync/projeto.sh *)",
+      "Bash(git status *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git diff)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git branch)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Edit(./ESTADO.md)",
+      "Edit(./01-conceito/**)",
+      "Edit(./02-arquitetura/**)",
+      "Edit(./03-execucao/**)",
+      "Edit(./04-leonardo/**)",
+      "Edit(./05-prompts/**)",
+      "Edit(./06-registro/**)"
+    ],
+    "deny": [
+      "Edit(./sync/projeto.lock)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "github"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/estado.sh\"",
+            "timeout": 15,
+            "statusMessage": "Lendo ESTADO.md"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/lembrete-sync.sh\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -5,7 +5,8 @@
 # muda aqui de forma relevante, ele precisa ser re-subido lá.
 #
 # Fica só no repo (instruções de construção, atrapalham na conversa):
-#   CLAUDE.md, 02-arquitetura/, 03-execucao/roadmap.md, 05-prompts/, README.md
+#   CLAUDE.md, 02-arquitetura/, 03-execucao/roadmap.md, 05-prompts/, README.md,
+#   .claude/, .mcp.json, .github/
 #
 # Uma linha por caminho, relativo à raiz do repo. `#` inicia comentário.
 

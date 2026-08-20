@@ -24,7 +24,7 @@ Estes não são preferências, são a razão do produto existir. Código que os 
 
 ## Convenções
 
-Ver `02-arquitetura/convencoes.md`.
+Ver `02-arquitetura/convencoes.md`. Como este repo está configurado — permissões, hooks, MCP e o que ainda não está ligado: `02-arquitetura/ferramentas.md`.
 
 ## Ao concluir uma tarefa
 
