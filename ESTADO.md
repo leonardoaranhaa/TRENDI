@@ -20,8 +20,10 @@ O que está sendo trabalhado agora:
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
-| C-02 | Identidade: cadastro, login, perfil mínimo | Claude Code | ✅ (entra de verdade só com L-17) |
-| L-17 | Registrar apps OAuth no Google e no Discord | Leonardo | ⬜ **nova** |
+| C-02 | Identidade: cadastro, login, perfil mínimo | Claude Code | ✅ |
+| C-37 | Conta nativa: cadastro, login, verificação, recuperação | Claude Code | ✅ **nova** |
+| L-17 | Registrar apps OAuth no Google e no Discord | Leonardo | ⬜ |
+| L-18 | Contratar provedor de e-mail transacional | Leonardo | ⬜ **nova** |
 | C-07 | Chat único por WebSocket | Claude Code | ⬜ próxima |
 
 ---
@@ -33,13 +35,14 @@ O que está sendo trabalhado agora:
 | L-03 pendente | Toda a camada de vídeo (C-03 a C-06, e C-21) | Rodar a pesquisa comparativa de fornecedores |
 | L-02 pendente | Monetização e verificação etária | Contratar consulta jurídica |
 | L-05 pendente | Pagamentos e contratos | Abrir CNPJ |
-| L-17 pendente | Entrar com conta real (Google/Discord) e publicar o protótipo (C-36) | Registrar os apps e guardar client id/secret |
+| L-17 pendente | Entrar pelo atalho do Google/Discord e publicar o protótipo (C-36) | Registrar os apps e guardar client id/secret |
+| L-18 pendente | Link de verificação e de recuperação chegar por e-mail | Contratar provedor de e-mail transacional |
 
 ---
 
 ## DECISÕES AGUARDANDO LEONARDO
 
-0. Registrar os apps OAuth (L-17) — sem isso ninguém entra com conta real
+0. Registrar os apps OAuth (L-17) e contratar provedor de e-mail (L-18)
 1. Confirmar nome definitivo após L-01
 2. Escolher fornecedor de infraestrutura de vídeo após L-03
 3. Definir se haverá prêmio em dinheiro (recomendação atual: não no lançamento)
@@ -57,9 +60,10 @@ Do lado do código, sem depender de nenhum dos três: **C-07** (chat por
 WebSocket) e depois **C-09** (votação simples), que já tem identidade para
 garantir uma conta, um voto.
 
-**L-17** entrou na lista: registrar os apps de OAuth. É rápido, e é o que
-separa "dá para entrar com provedor de teste" de "dá para entrar com a sua
-conta do Discord".
+Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
+OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
+conta nativa já funciona de ponta a ponta, e fora de produção os links de
+verificação e recuperação voltam na própria resposta da API.
 
 ---
 
@@ -80,6 +84,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-37: conta nativa com senha, verificação de e-mail e recuperação — OAuth virou atalho (D-19) | C-07 (chat) — e L-17, L-18 do lado do Leonardo |
 | 2026-08-20 | C-02: login por OAuth, sessão em cookie, perfil mínimo, Prisma e hospedagem escolhida (96 testes) | C-07 (chat) — e L-17 do lado do Leonardo |
 | 2026-08-20 | C-01, C-08 e a fórmula do voto cruzado: monorepo, API, tempo real, cliente web, schema e 41 testes | C-02 (identidade) ou C-07 (chat) |
 | 2026-08-20 | Cérebro no repo, sincronia com o Projeto e ambiente do Claude Code | Começar a construção pela C-01 |

@@ -47,6 +47,12 @@ L-01 (nome)
 ```
 
 ```
+L-18 (provedor de e-mail)
+  └─→ verificação de e-mail e recuperação de senha chegarem à caixa de entrada
+        (C-37 já funciona; fora de produção o link volta na resposta da API)
+```
+
+```
 L-17 (apps OAuth registrados)
   └─→ entrar com conta real (C-02 já roda com provedor falso)
         └─→ C-36 (publicar o protótipo)

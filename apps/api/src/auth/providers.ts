@@ -55,6 +55,9 @@ function googleProvider(config: ApiConfig): OAuthProvider | undefined {
         provider: 'google',
         providerAccountId: sub,
         email: asString(claims['email']),
+        // O Google diz se o dono provou ser dono. É esse campo que autoriza
+        // ligar este login a uma conta nativa do mesmo e-mail.
+        emailVerified: claims['email_verified'] === true,
         displayName: asString(claims['name']),
         avatarUrl: asString(claims['picture']),
         username: asString(claims['name']),
@@ -91,6 +94,7 @@ function discordProvider(config: ApiConfig): OAuthProvider | undefined {
         provider: 'discord',
         providerAccountId: id,
         email: asString(user['email']),
+        emailVerified: user['verified'] === true,
         displayName: asString(user['global_name']) ?? asString(user['username']),
         avatarUrl:
           avatar === undefined ? undefined : `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`,
@@ -123,6 +127,7 @@ export function fakeProvider(config: ApiConfig): OAuthProvider {
         provider: 'fake',
         providerAccountId: profile.sub,
         email: profile.email,
+        emailVerified: profile.emailVerified ?? false,
         displayName: profile.name,
         username: profile.username ?? profile.name,
       });
@@ -133,6 +138,7 @@ export function fakeProvider(config: ApiConfig): OAuthProvider {
 export interface FakeProfile {
   sub: string;
   email?: string | undefined;
+  emailVerified?: boolean | undefined;
   name?: string | undefined;
   username?: string | undefined;
 }

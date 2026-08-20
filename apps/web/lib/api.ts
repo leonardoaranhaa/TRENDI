@@ -18,6 +18,10 @@ export interface SessionUser {
   displayName: string | null;
   avatarUrl: string | null;
   role: string;
+  email: string | null;
+  emailVerified: boolean;
+  /** Falso em quem entrou só por Google ou Discord e nunca criou senha. */
+  hasPassword: boolean;
 }
 
 /** Quem está logado nesta requisição, ou `null`. */

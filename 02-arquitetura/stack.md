@@ -23,7 +23,8 @@ Ver decisão D-14.
 | API | **Fastify** | Escolhido em D-14: cabe na cabeça inteiro |
 | Tempo real | Servidor WebSocket dedicado | Isolar carga de chat da API |
 | Fila | BullMQ sobre Redis | Matchmaking, renderização de clipes, moderação |
-| Identidade | **OAuth (Google e Discord) com `arctic`** | Sem senha para guardar — decisão D-15 |
+| Identidade | **Conta nativa (e-mail e senha) + OAuth com `arctic`** | A porta da frente é nossa; provedor é atalho — decisão D-19 |
+| Senha | **`scrypt` do próprio Node** | Sal por senha e custo gravado no registro; sem dependência nativa |
 | Sessão | **Token opaco em cookie httpOnly** | Revogável na hora; hash no banco — decisão D-16 |
 
 **Por que TypeScript em tudo:** projeto solo não comporta troca de contexto entre linguagens. Tipos compartilhados entre cliente e servidor eliminam uma classe inteira de bugs.

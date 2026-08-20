@@ -20,8 +20,12 @@ model User {
   id          String    @id @db.Uuid
   handle      String    @unique
   // Nulo porque nem todo provedor de OAuth devolve e-mail: no Discord o
-  // usuário pode negar o escopo. Identidade é a conta do provedor, não o e-mail.
+  // usuário pode negar o escopo. Quem cria conta nativa sempre tem.
   email       String?   @unique
+  /// Nulo em quem entrou só por Google ou Discord: essa gente não tem senha.
+  passwordHash String?  @map("password_hash")
+  /// Quando o dono do e-mail provou que é dono.
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
   displayName String?   @map("display_name")
   avatarUrl   String?   @map("avatar_url")
   role        String    @default("viewer")
@@ -32,6 +36,7 @@ model User {
   creator     Creator?
   accounts    Account[]
   sessions    Session[]
+  authTokens  AuthToken[]
   attendance  Attendance[]
   messages    Message[]
   resultVotes ResultVote[]
@@ -69,6 +74,23 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+/// Token de uso único: verificação de e-mail e redefinição de senha.
+/// Como na sessão, só o hash mora aqui (D-16).
+model AuthToken {
+  id        String    @id @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  purpose   String
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(6)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose], map: "auth_tokens_user_id_purpose_idx")
+  @@map("auth_tokens")
 }
 
 model Creator {

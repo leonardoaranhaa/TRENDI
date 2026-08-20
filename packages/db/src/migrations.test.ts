@@ -148,10 +148,21 @@ describe('migrations', () => {
     }
   });
 
-  it('não guardam senha — login é só por OAuth, decisão D-15', async () => {
+  it('guardam hash de senha, nunca a senha — decisão D-19', async () => {
     const colunas = await columnsOf('users');
-    for (const proibida of ['password', 'password_hash', 'salt', 'reset_token']) {
+
+    // A conta nativa existe e tem senha (D-19 revisou a D-15). O que não
+    // pode existir é coluna capaz de guardar a senha em claro.
+    expect(colunas).toContain('password_hash');
+    for (const proibida of ['password', 'password_plain', 'senha', 'password_clear']) {
       expect(colunas).not.toContain(proibida);
     }
+  });
+
+  it('guardam só o hash do token de e-mail e de recuperação', async () => {
+    const colunas = await columnsOf('auth_tokens');
+
+    expect(colunas).toContain('token_hash');
+    expect(colunas).not.toContain('token');
   });
 });

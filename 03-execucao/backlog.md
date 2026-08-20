@@ -37,12 +37,19 @@
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ⬜ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | L-06 |
+| C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
+| L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
 | C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
 
-> `C-02` está construída e testada com um provedor falso. Para alguém entrar
-> com a conta de verdade falta `L-17` — registrar os apps e colocar as
-> credenciais no ambiente. Nada de código depende disso.
+> `C-37` fez do login por senha a porta da frente (decisão D-19): dá para criar
+> conta e entrar sem depender de Google nem Discord. O que falta é o carteiro —
+> `L-18`, provedor de e-mail, para os links de verificação e de recuperação
+> saírem daqui. Fora de produção eles voltam na própria resposta da API.
+>
+> `C-02` está construída e testada com um provedor falso. Para entrar com a
+> conta do Google ou do Discord de verdade falta `L-17`, que é cadastro nos
+> dois portais. Nada de código depende disso.
 
 ---
 

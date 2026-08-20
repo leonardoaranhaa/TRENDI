@@ -16,6 +16,8 @@ export interface ApiConfig {
   readonly realtimeTicketSecret: string;
   /** Liga o provedor falso, que permite entrar sem Google nem Discord. */
   readonly fakeProviderEnabled: boolean;
+  /** Limite de tentativas em cadastro, login e recuperação. */
+  readonly rateLimitEnabled: boolean;
   readonly google: OAuthCredentials | undefined;
   readonly discord: OAuthCredentials | undefined;
 }
@@ -52,6 +54,9 @@ export function loadConfig(env = process.env): ApiConfig {
     // Em produção o provedor falso não existe, aconteça o que acontecer com
     // a variável de ambiente: seria uma porta para entrar como qualquer um.
     fakeProviderEnabled: !isProduction && env['AUTH_FAKE_PROVIDER'] === '1',
+    // Desligado em teste: a suíte faz dezenas de logins seguidos, e limite
+    // de tentativas ali mediria a suíte, não o ataque.
+    rateLimitEnabled: nodeEnv !== 'test' && env['RATE_LIMIT_DISABLED'] !== '1',
     google: credentials('GOOGLE'),
     discord: credentials('DISCORD'),
   };

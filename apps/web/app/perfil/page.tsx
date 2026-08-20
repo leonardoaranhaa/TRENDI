@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSessionUser } from '../../lib/api';
+import { Conta } from './conta';
 import { PerfilForm } from './perfil-form';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,7 @@ export default async function Perfil({
       </header>
 
       <PerfilForm user={user} />
+      <Conta user={user} />
     </main>
   );
 }

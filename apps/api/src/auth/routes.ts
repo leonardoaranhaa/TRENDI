@@ -1,21 +1,27 @@
 import { generateCodeVerifier, generateState } from 'arctic';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
-  SESSION_TTL_MS,
   createSession,
   deleteSession,
-  readSession,
   signInWithProvider,
   updateProfile,
   validateHandle,
   type PrismaClient,
-  type User,
 } from '@trendi/db';
 import { issueRealtimeTicket } from '@trendi/shared/realtime-ticket';
 import type { ApiConfig } from '../config.js';
 import { availableProviders } from './providers.js';
+import {
+  SESSION_COOKIE,
+  clearSessionCookie,
+  cookieOptions,
+  currentUser as sessionUser,
+  publicUser,
+  setSessionCookie as writeSessionCookie,
+} from './session-cookie.js';
 
-export const SESSION_COOKIE = 'trendi_session';
+export { SESSION_COOKIE } from './session-cookie.js';
+
 const STATE_COOKIE = 'trendi_oauth_state';
 const VERIFIER_COOKIE = 'trendi_oauth_verifier';
 /** A ida até o provedor e a volta. Se demorar mais que isso, foi abandonada. */
@@ -26,51 +32,16 @@ interface AuthOptions {
   readonly prisma: PrismaClient;
 }
 
-/** Como o cliente enxerga quem está logado. Só o que a tela precisa. */
-function publicUser(user: User) {
-  return {
-    id: user.id,
-    handle: user.handle,
-    displayName: user.displayName,
-    avatarUrl: user.avatarUrl,
-    role: user.role,
-  };
-}
-
 export async function authRoutes(app: FastifyInstance, options: AuthOptions): Promise<void> {
   const { config, prisma } = options;
   const providers = availableProviders(config);
+  const cookieBase = cookieOptions(config);
 
-  const cookieBase = {
-    httpOnly: true,
-    sameSite: 'lax' as const,
-    secure: config.isProduction,
-    path: '/',
-    ...(config.cookieDomain === undefined ? {} : { domain: config.cookieDomain }),
-  };
+  const setSessionCookie = (reply: FastifyReply, token: string, expiresAt: Date): void =>
+    writeSessionCookie(reply, config, token, expiresAt);
 
-  function setSessionCookie(reply: FastifyReply, token: string, expiresAt: Date): void {
-    reply.setCookie(SESSION_COOKIE, token, {
-      ...cookieBase,
-      expires: expiresAt,
-      maxAge: Math.floor(SESSION_TTL_MS / 1000),
-    });
-  }
-
-  /** A sessão de quem fez a requisição, renovando o cookie se o prazo esticou. */
-  async function currentUser(request: FastifyRequest, reply: FastifyReply): Promise<User | null> {
-    const token = request.cookies[SESSION_COOKIE];
-    if (token === undefined) return null;
-
-    const session = await readSession(prisma, token);
-    if (session === null) {
-      reply.clearCookie(SESSION_COOKIE, cookieBase);
-      return null;
-    }
-
-    if (session.renewed) setSessionCookie(reply, token, session.expiresAt);
-    return session.user;
-  }
+  const currentUser = (request: FastifyRequest, reply: FastifyReply) =>
+    sessionUser(prisma, config, request, reply);
 
   app.get('/auth/providers', () => ({ providers: [...providers.keys()] }));
 
@@ -150,7 +121,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthOptions): Pr
   app.post('/auth/logout', async (request, reply) => {
     const token = request.cookies[SESSION_COOKIE];
     if (token !== undefined) await deleteSession(prisma, token);
-    reply.clearCookie(SESSION_COOKIE, cookieBase);
+    clearSessionCookie(reply, config);
     return { ok: true };
   });
 

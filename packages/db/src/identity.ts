@@ -7,6 +7,8 @@ export interface ProviderProfile {
   readonly provider: string;
   readonly providerAccountId: string;
   readonly email?: string | undefined;
+  /** O provedor afirma que o dono do e-mail provou ser dono. */
+  readonly emailVerified?: boolean | undefined;
   readonly displayName?: string | undefined;
   readonly avatarUrl?: string | undefined;
   /** Nome sugerido pelo provedor; vira handle depois de normalizado. */
@@ -17,15 +19,23 @@ export interface SignInResult {
   readonly user: User;
   /** Primeira vez desta pessoa aqui. */
   readonly created: boolean;
+  /** O provedor foi ligado a uma conta que já existia, com o mesmo e-mail. */
+  readonly linked?: boolean;
 }
 
 /**
  * Entra com uma conta de provedor: acha o usuário se a conta já é conhecida,
- * cria os dois se não é.
+ * liga ao dono do e-mail quando é seguro, e cria conta nova se não é nem um
+ * nem outro.
  *
- * A chave é (provider, provider_account_id), não o e-mail. E-mail muda, pode
- * vir vazio, e casar contas por e-mail é como se entrega a conta de alguém
- * para quem registrou o mesmo endereço em outro serviço.
+ * A chave é (provider, provider_account_id), não o e-mail. Casar contas por
+ * e-mail sem mais nada entrega a conta de alguém para quem registrou o mesmo
+ * endereço em outro serviço.
+ *
+ * A exceção é o caso em que os dois lados provaram ser donos do e-mail: o
+ * provedor diz que verificou, e a conta daqui verificou também. Aí ligar é
+ * seguro — e não ligar seria pior, porque quem criou conta nativa e depois
+ * clica em "entrar com Google" espera cair na própria conta.
  */
 export async function signInWithProvider(
   prisma: PrismaClient,
@@ -50,6 +60,28 @@ export async function signInWithProvider(
       },
     });
     return { user, created: false };
+  }
+
+  // Mesma pessoa, provada dos dois lados: liga o provedor à conta que já existe.
+  const claimable = await claimableAccount(prisma, profile);
+  if (claimable !== null) {
+    await prisma.account.create({
+      data: {
+        id: randomUUID(),
+        userId: claimable.id,
+        provider: profile.provider,
+        providerAccountId: profile.providerAccountId,
+      },
+    });
+
+    const user = await prisma.user.update({
+      where: { id: claimable.id },
+      data: {
+        displayName: claimable.displayName ?? profile.displayName ?? null,
+        avatarUrl: claimable.avatarUrl ?? profile.avatarUrl ?? null,
+      },
+    });
+    return { user, created: false, linked: true };
   }
 
   const handle = await findFreeHandle(
@@ -77,6 +109,23 @@ export async function signInWithProvider(
   });
 
   return { user, created: true };
+}
+
+/**
+ * A conta daqui que pode receber este provedor: mesmo e-mail, verificado dos
+ * dois lados. Sem verificação, quem registrasse a conta nativa com o e-mail
+ * de outra pessoa herdaria a conta dela no primeiro login por Google.
+ */
+async function claimableAccount(
+  prisma: PrismaClient,
+  profile: ProviderProfile,
+): Promise<User | null> {
+  if (profile.email === undefined || profile.email === '') return null;
+  if (profile.emailVerified !== true) return null;
+
+  const user = await prisma.user.findUnique({ where: { email: profile.email } });
+  if (user === null || user.emailVerifiedAt === null) return null;
+  return user;
 }
 
 async function isEmailFree(prisma: PrismaClient, email: string | undefined): Promise<boolean> {

@@ -146,8 +146,13 @@ psql "$DATABASE_URL" -f packages/db/prisma/migrations/0001_core/migration.sql
 psql "$DATABASE_URL" -f packages/db/prisma/migrations/0002_identity/migration.sql
 ```
 
-Com `AUTH_FAKE_PROVIDER=1` dá para entrar sem Google nem Discord — é assim
-que o login se desenvolve enquanto `L-17` não sai.
+Dá para criar conta com e-mail e senha direto na tela `/criar-conta` — não
+depende de provedor nenhum. Os links de verificação e de recuperação ainda
+não são enviados por e-mail (falta `L-18`), então fora de produção eles voltam
+na própria resposta da API e aparecem na tela.
+
+Com `AUTH_FAKE_PROVIDER=1` também dá para exercitar o login por provedor sem
+Google nem Discord, enquanto `L-17` não sai.
 
 | Pasta | O que é |
 |---|---|

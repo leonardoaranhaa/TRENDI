@@ -151,7 +151,7 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 ---
 
 ## D-15 — Login só por OAuth, sem senha
-**Data:** 2026-08-20 **Status:** travada
+**Data:** 2026-08-20 **Status:** revista no mesmo dia — ver D-19
 
 **Decisão:** entra-se na TRENDI por Google ou Discord. Não existe cadastro com senha.
 
@@ -201,6 +201,23 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 **O que impede as duas metades divergirem:** um teste roda `prisma migrate diff` entre o banco criado pelas migrations e o schema. Diferença reprova o PR. Foi ele que pegou, no primeiro dia, que as chaves estrangeiras escritas à mão não tinham a mesma ação de referência que o Prisma esperava.
 
 **Descartado:** deixar o Prisma gerar as migrations (exige banco sombra e tira a legibilidade do SQL); Drizzle (schema em TypeScript, duplicando o que o `.sql` já diz).
+
+---
+
+## D-19 — Conta nativa é a porta da frente; OAuth é atalho
+**Data:** 2026-08-20 **Status:** travada (revisa a D-15)
+
+**Decisão:** dá para criar conta na TRENDI com e-mail e senha. Google e Discord continuam, como caminho rápido para quem prefere.
+
+**Por quê:** decisão do Leonardo, e ela resolve um problema real da D-15: depender só de provedor externo é entregar a porta de entrada para terceiro. Se o Discord cair ou mudar de política, ninguém novo entra. Parte do público-alvo também não quer amarrar a conta de rede social a uma plataforma nova — e essa fricção aparece justamente no cadastro, que é onde menos se pode perder gente.
+
+**Como a senha é guardada:** `scrypt`, que vem no Node, com sal por senha e os parâmetros de custo gravados no próprio registro para poder endurecer depois sem invalidar o que já existe. Nada de dependência nativa para compilar.
+
+**Política de senha:** mínimo de 10 caracteres, teto de 200, recusa das mais tentadas do mundo e da senha igual ao e-mail. Sem exigir maiúscula, número e símbolo — regra de composição empurra todo mundo para `Senha@123`, e a recomendação atual do NIST é justamente tamanho em vez de composição.
+
+**Quando conta nativa e OAuth se juntam:** só quando os dois lados provaram ser donos do e-mail — o provedor diz que verificou, e a conta daqui verificou também. Sem essa trava, bastaria cadastrar com o e-mail de outra pessoa e esperar ela entrar pelo Google para herdar a conta dela.
+
+**Custo da decisão:** senha é superfície de ataque e trabalho contínuo — limite de tentativas, recuperação, e um provedor de e-mail para os links (tarefa L-18). Aceito conscientemente: a alternativa era depender de terceiro para existir.
 
 ## MODELO PARA NOVAS DECISÕES
 
