@@ -1,0 +1,33 @@
+# Subconjunto que vive também no Projeto do Claude (web/app).
+#
+# Regra: o repositório é a fonte da verdade. Estes arquivos são duplicados
+# no Projeto porque é neles que se raciocina em conversa. Quando um deles
+# muda aqui de forma relevante, ele precisa ser re-subido lá.
+#
+# Fica só no repo (instruções de construção, atrapalham na conversa):
+#   CLAUDE.md, 02-arquitetura/, 03-execucao/roadmap.md, 05-prompts/, README.md,
+#   .claude/, .mcp.json, .github/
+#
+# Uma linha por caminho, relativo à raiz do repo. `#` inicia comentário.
+
+# Toda sessão começa aqui
+ESTADO.md
+
+# Onde se pensa produto e mecânica
+01-conceito/produto.md
+01-conceito/regras-do-duelo.md
+01-conceito/catalogo-desafios.md
+
+# O que fazer e o que está travado
+03-execucao/backlog.md
+03-execucao/dependencias.md
+
+# Jurídico, fornecedor, criador, dinheiro — o mundo real
+04-leonardo/juridico.md
+04-leonardo/fornecedores.md
+04-leonardo/criadores.md
+04-leonardo/financeiro.md
+
+# Decisões travadas e aprendizados
+06-registro/decisoes.md
+06-registro/aprendizados.md

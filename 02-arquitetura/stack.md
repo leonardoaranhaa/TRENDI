@@ -1,0 +1,54 @@
+# STACK TÉCNICA
+
+> Proposta inicial. Ajustar conforme o fornecedor de vídeo escolhido em L-03.
+
+## Frontend
+
+| Item | Escolha | Motivo |
+|---|---|---|
+| Framework | Next.js (React) | SSR para SEO dos clipes e perfis; ecossistema maduro |
+| Estilo | Tailwind | Velocidade de iteração |
+| Tempo real | WebSocket nativo ou Socket.io | Chat, barulhômetro, estado do duelo |
+| Vídeo | SDK do fornecedor escolhido | Depende de L-03 |
+
+## Backend
+
+| Item | Escolha | Motivo |
+|---|---|---|
+| Runtime | Node.js (TypeScript) | Mesma linguagem do frontend — crítico para dev solo |
+| API | Fastify ou NestJS | Fastify se prioridade é simplicidade; NestJS se estrutura |
+| Tempo real | Servidor WebSocket dedicado | Isolar carga de chat da API |
+| Fila | BullMQ sobre Redis | Matchmaking, renderização de clipes, moderação |
+
+**Por que TypeScript em tudo:** projeto solo não comporta troca de contexto entre linguagens. Tipos compartilhados entre cliente e servidor eliminam uma classe inteira de bugs.
+
+## Dados
+
+| Item | Uso |
+|---|---|
+| **PostgreSQL** | Usuários, duelos, votos consolidados, ranking, financeiro |
+| **Redis** | Fila de matchmaking, contagem de votos em tempo real, barulhômetro, limitação de taxa, presença |
+| **Object Storage (S3 ou equivalente)** | Gravações, clipes, assets |
+| **CDN** | Vídeo e clipes |
+
+## Infraestrutura
+
+| Item | Escolha inicial |
+|---|---|
+| Hospedagem de app | Vercel (frontend) + serviço de container para backend |
+| Banco | Postgres gerenciado |
+| Vídeo | **Pendente — L-03** |
+| Observabilidade | Logs estruturados + monitoramento de erro desde o dia 1 |
+
+**Regra para projeto solo:** preferir sempre serviço gerenciado a self-hosted, mesmo custando mais. Seu recurso escasso é tempo, não dinheiro de infraestrutura.
+
+## IA
+
+| Função | Abordagem |
+|---|---|
+| Moderação de chat | Camadas: lista de bloqueio → LLM barato com prompt em PT-BR → fila humana |
+| Extração de sugestões do chat | Agregação de termos + LLM para consolidar |
+| Estimativa de idade | Serviço especializado — **não** construir do zero |
+| Curadoria de clipes | Detecção de pico no barulhômetro |
+
+**Evitar:** Perspective API do Google — encerra em dezembro de 2026.
