@@ -123,6 +123,51 @@ Detalhes de permissões, MCP e o que ainda não está ligado (e por quê): `02-a
 
 ---
 
+## COMO RODAR O CÓDIGO
+
+Monorepo com npm workspaces. Node 22 (`.nvmrc`).
+
+```bash
+npm install          # uma vez, na raiz
+cp env.exemplo .env  # e ajuste o que precisar
+npm test             # fórmula, duelo, identidade, API, tempo real e migrations
+npm run typecheck    # pacotes, apps e testes
+npm run dev:web      # cliente em http://localhost:3000
+npm run dev:api      # API em http://localhost:3001
+npm run dev:realtime # WebSocket em ws://localhost:3002
+```
+
+Os testes não precisam de banco instalado: sem `DATABASE_URL` eles sobem um
+Postgres em memória. Para rodar a API de verdade, aí sim:
+
+```bash
+docker compose up -d                                        # Postgres local
+psql "$DATABASE_URL" -f packages/db/prisma/migrations/0001_core/migration.sql
+psql "$DATABASE_URL" -f packages/db/prisma/migrations/0002_identity/migration.sql
+```
+
+Dá para criar conta com e-mail e senha direto na tela `/criar-conta` — não
+depende de provedor nenhum. Os links de verificação e de recuperação ainda
+não são enviados por e-mail (falta `L-18`), então fora de produção eles voltam
+na própria resposta da API e aparecem na tela.
+
+Com `AUTH_FAKE_PROVIDER=1` também dá para exercitar o login por provedor sem
+Google nem Discord, enquanto `L-17` não sai.
+
+| Pasta | O que é |
+|---|---|
+| `packages/shared` | Regras do duelo: voto cruzado e máquina de estados. Um lugar só, com teste. |
+| `packages/db` | Schema (Prisma), migrations em SQL, e o acesso ao banco |
+| `apps/api` | API HTTP (Fastify) |
+| `apps/realtime` | Servidor WebSocket (`ws`) |
+| `apps/web` | Cliente (Next.js) |
+
+Onde cada coisa é publicada — Vercel, Fly.io e Supabase — está na decisão D-17.
+
+O que está montado e o que ainda não: `02-arquitetura/stack.md` e o backlog.
+
+---
+
 ## FLUXO DE TRABALHO
 
 ```

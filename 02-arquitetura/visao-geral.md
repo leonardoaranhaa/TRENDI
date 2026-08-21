@@ -19,12 +19,12 @@ Competidor B (navegador, WebRTC/WHIP) ─┘      (canvas único)   └→ LL-HL
 | Etapa | Decisão |
 |---|---|
 | **Captação** | WebRTC direto do navegador via `getUserMedia` + WHIP. Zero download. |
-| **Servidor de mídia** | SFU **gerenciado**. Operar SFU próprio exige um time inteiro de infraestrutura. |
-| **Composição** | Servidor monta split-screen com placar, barulhômetro e overlays num canvas único. |
-| **Distribuição** | WebRTC para competidores e primeira fila; LL-HLS via CDN para o grosso da audiência (latência 2–5s, custo muito menor). |
+| **Servidor de mídia** | **Amazon IVS Real-Time** (stage). SFU gerenciado — operar SFU próprio exige um time inteiro de infraestrutura. |
+| **Composição** | IVS compõe o split-screen no servidor. Placar e barulhômetro ficam em DOM sobre o vídeo, não queimados no quadro — ver D-20. |
+| **Distribuição** | WebRTC no stage para os competidores; channel LL-HLS para o grosso da audiência (latência 2–5s, custo muito menor). |
 | **Gravação** | Tudo gravado — viabiliza os clipes, que são produto premium. |
 
-> ⚠️ **Fornecedor ainda não escolhido.** Bloqueio L-03. Não escrever código de vídeo antes disso.
+> ✅ **Fornecedor escolhido: Amazon IVS** (decisão D-20, 2026-08-20). Falta criar a conta — `L-19`. Até lá, o código roda contra um fornecedor falso.
 
 ## Realidade de custo
 

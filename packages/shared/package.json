@@ -1,0 +1,23 @@
+{
+  "name": "@trendi/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tipos, constantes e f\u00f3rmulas compartilhadas entre cliente e servidor",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./realtime-ticket": {
+      "types": "./dist/realtime-ticket.d.ts",
+      "default": "./dist/realtime-ticket.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@trendi/video",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Camada de mídia: captação, composição e distribuição do duelo",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "typecheck": "tsc --build"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ivs-realtime": "^3.1115.0",
+    "@trendi/shared": "*"
+  }
+}

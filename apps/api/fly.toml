@@ -1,0 +1,29 @@
+# API HTTP. Deploy a partir da raiz do repo: `fly deploy -c apps/api/fly.toml`
+#
+# Região no Brasil porque o público é brasileiro e a votação sente latência.
+# Confira o código de região disponível na sua conta antes do primeiro deploy.
+app = "trendi-api"
+primary_region = "gru"
+
+[build]
+  dockerfile = "apps/api/Dockerfile"
+
+[env]
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_start_machines = true
+  # Sessão e fila não sobrevivem a partida a frio no meio de um duelo.
+  auto_stop_machines = false
+  min_machines_running = 1
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/health"

@@ -1,2 +1,9 @@
 dist/
 .claude/settings.local.json
+node_modules/
+*.tsbuildinfo
+.next/
+.env
+.env.local
+next-env.d.ts
+packages/db/src/generated/

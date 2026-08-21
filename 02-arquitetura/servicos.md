@@ -3,10 +3,10 @@
 | Serviço | Função | Fase |
 |---|---|---|
 | **Identidade** | Cadastro, login, verificação de idade, perfis | 1 |
-| **Duelo** | Máquina de estados: fila → aceite → escolha → execução → votação → resultado | 1 |
+| **Duelo** | Máquina de estados: fila → aceite → escolha → execução → votação → resultado | 1 · *entregue em C-08 e C-09; timeout automático espera o agendador de C-16* |
 | **Mídia** | Integração com fornecedor: criar sala, ingestão, composição, gravação | 1 |
-| **Chat** | WebSocket, três salas por duelo, regra de leitura total e escrita restrita | 1 |
-| **Votação** | Recebe votos, aplica pesos cruzados, normaliza, antifraude | 1 |
+| **Chat** | WebSocket, três salas por duelo, regra de leitura total e escrita restrita | 1 · *sala única entregue em C-07; as três chegam em C-11* |
+| **Votação** | Recebe votos, aplica pesos cruzados, normaliza, antifraude | 1 · *contagem simples entregue em C-09; peso cruzado em C-14* |
 | **Matchmaking** | Fila, pareamento por faixa, prioridade e penalidade | 2 |
 | **Barulhômetro** | Agrega sinais por lado, normaliza por tamanho de torcida, publica em tempo real | 2 |
 | **Moderação** | Pipeline em camadas, fila humana, ações | 2 |

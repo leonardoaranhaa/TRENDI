@@ -2,9 +2,38 @@
 
 ---
 
-## L-03 — INFRAESTRUTURA DE VÍDEO (bloqueio crítico)
+## L-03 — INFRAESTRUTURA DE VÍDEO ✅ DECIDIDO: Amazon IVS
 
-É o maior bloqueio do projeto. Metade da Fase 1 depende disso.
+**Decidido em 2026-08-20**, com autorização sua para o Claude Code escolher. O registro completo, com o porquê e o gatilho de revisão, está em `06-registro/decisoes.md`, D-20.
+
+**O desenho:** Real-Time (stage) recebe os dois competidores pelo navegador → composição no servidor em grade, que é o split-screen → channel de Low-Latency Streaming entrega para a plateia em HLS → gravação composta vai para o S3, que é a matéria-prima dos clipes.
+
+**Preço levantado, América do Sul:**
+
+| Item | Preço |
+|---|---|
+| Participante no stage (cada competidor) | $0,084/hora |
+| Composição no servidor (HD) | $0,30/hora |
+| Entrega para a plateia (HD) | $0,084/espectador-hora |
+| Entrega (SD) | $0,042/espectador-hora |
+
+Duelo de 30 min com 200 espectadores em HD: ~$0,25 de captação e composição, ~$8,40 de entrega. **A entrega é 97% da conta** — é ela que `L-04` precisa modelar, e é ela que decide se sucesso vira prejuízo.
+
+**O que falta, e é seu (`L-19`):**
+
+- [ ] Criar a conta AWS e habilitar IVS
+- [ ] Confirmar que IVS Real-Time atende em `sa-east-1` (São Paulo)
+- [ ] Confirmar o comportamento da grade de composição com dois participantes
+- [ ] Conferir os preços acima — pesquisa de preço envelhece
+- [ ] Guardar as credenciais como variável de ambiente (nunca no repo)
+
+Enquanto isso não existe, o código roda contra um fornecedor falso, do mesmo jeito que o login roda sem Google.
+
+---
+
+## Como esta decisão foi tomada (fica para as próximas)
+
+É o maior bloqueio do projeto. Metade da Fase 1 dependia disso.
 
 ### Critérios de avaliação
 
@@ -38,7 +67,7 @@
 3. Testar na prática os 2 finalistas — subir um split-screen de teste antes de decidir
 4. Registrar a decisão em `06-registro/decisoes.md`
 
-> A comparação detalhada ainda não foi feita. É a próxima pesquisa a rodar.
+**Resultado da comparação:** Amazon IVS levou por ter presença confirmada na América do Sul somada a composição gerenciada. LiveKit Cloud foi o segundo — open source, com saída de auto-hospedagem, e composição que renderiza página web — e perdeu por não ter região no Brasil confirmada. Cloudflare Realtime não faz composição gerenciada de dois participantes. O passo 3 (subir um split-screen de teste) fica para quando a conta existir: é `L-19`.
 
 ---
 
