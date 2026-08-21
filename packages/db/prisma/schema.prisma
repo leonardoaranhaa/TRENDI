@@ -141,6 +141,12 @@ model Duel {
   scoreB           Decimal?  @map("score_b") @db.Decimal(6, 5)
   countsForRanking Boolean   @default(false) @map("counts_for_ranking")
   recordingUrl     String?   @map("recording_url")
+  /// Palco de mídia do duelo. Aberto no ACEITE — ver C-03 e decisão D-20.
+  stageId          String?   @map("stage_id")
+  /// Composição no ar. Nulo quando não está rodando.
+  compositionId    String?   @map("composition_id")
+  /// Onde a plateia assiste. Só existe com a composição no ar.
+  playbackUrl      String?   @map("playback_url")
 
   challenge   Challenge?       @relation(fields: [challengeId], references: [id])
   userA       User             @relation("creatorA", fields: [creatorA], references: [id])

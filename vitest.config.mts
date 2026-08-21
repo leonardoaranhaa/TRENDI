@@ -14,6 +14,7 @@ export default defineConfig({
       '@trendi/shared': src('./packages/shared/src/index.ts'),
       '@trendi/db/testing': src('./packages/db/src/testing.ts'),
       '@trendi/db': src('./packages/db/src/index.ts'),
+      '@trendi/video': src('./packages/video/src/index.ts'),
     },
   },
   test: {

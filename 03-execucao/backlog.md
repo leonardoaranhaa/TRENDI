@@ -12,10 +12,10 @@
 |---|---|---|---|---|
 | L-01 | Verificar nome TRENDI: domínio, INPI, redes | L | ⬜ | — |
 | L-02 | Consulta jurídica: monetização, biometria, música | L | ⬜ | — |
-| L-03 | Pesquisa e escolha do fornecedor de vídeo | L | ⬜ | — |
+| L-03 | Pesquisa e escolha do fornecedor de vídeo | L→C | ✅ | — |
 | L-04 | Modelar custo por espectador-hora | L | ⬜ | L-03 |
 | L-05 | Abrir CNPJ e definir regime tributário | L | ⬜ | L-01 |
-| L-06 | Escrever regras dos 10 desafios | L | ⬜ | — |
+| L-06 | Escrever as regras da plataforma | L→C | ✅ | — |
 | L-07 | Mapear organizadores de batalha de aura | L | ⬜ | — |
 | L-08 | Escolher serviço de estimativa de idade | L | ⬜ | L-02 |
 | L-09 | Definir parâmetros numéricos da penalidade | L | ⬜ | — |
@@ -29,23 +29,28 @@
 |---|---|---|---|---|
 | C-01 | Montar repositório, stack base, convenções | C | ✅ | — |
 | C-02 | Identidade: cadastro, login, perfil mínimo | C | ✅ | C-01 |
-| C-03 | Integrar SDK do fornecedor de vídeo | C | 🔴 | **L-03** |
+| C-03 | Integrar SDK do fornecedor de vídeo | C | ✅ | — |
 | C-04 | Captação WebRTC do navegador (sem download) | C | ⬜ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ⬜ | C-04 |
 | C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
 | C-07 | Chat único por WebSocket | C | ✅ | C-01 |
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ✅ | C-08 |
-| C-10 | Desafio fixo da categoria Aura | C | ⬜ | L-06 |
+| C-10 | Desafio fixo da categoria Aura | C | ⬜ | — |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
+| L-19 | Criar conta AWS e habilitar IVS | L | ⬜ | — |
 | C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
 
-> **A fila de código da Fase 1 acabou.** O que sobra aqui depende de você:
-> `C-10` espera `L-06` (regras dos desafios) e `C-03` a `C-06` esperam `L-03`
-> (fornecedor de vídeo). Construir Fase 2 agora seria exatamente o que o
-> roadmap manda não fazer.
+> **A fila voltou a andar.** `L-03` e `L-06` foram resolvidas em 2026-08-20 —
+> a primeira por autorização sua para o Claude Code decidir (fornecedor: Amazon
+> IVS, decisão D-20), a segunda em forma nova: três regras de conduta da
+> plataforma, porque quem julga desempenho é a plateia (decisão D-21).
+>
+> Com isso, `C-03` a `C-06` e `C-10` estão desbloqueadas. O que ainda espera
+> você é `L-19` — criar a conta AWS —, mas isso não trava construir: o código
+> roda contra um fornecedor falso, como já faz com o login.
 
 > `C-37` fez do login por senha a porta da frente (decisão D-19): dá para criar
 > conta e entrar sem depender de Google nem Discord. O que falta é o carteiro —

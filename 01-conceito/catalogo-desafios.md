@@ -2,7 +2,10 @@
 
 10 categorias de lançamento. Cada desafio precisa de: nome, regra em uma frase, faixa de tempo, critério visível de julgamento e nível de idade.
 
-> ⚠️ As regras detalhadas de cada desafio individual ainda precisam ser escritas — tarefa L-06.
+> **O que a plataforma faz cumprir são as três regras de conduta** —
+> `regras-da-plataforma.md`, decisão D-21. O "critério visível de julgamento"
+> abaixo não é regra: é a frase que diz à plateia o que ela está julgando.
+> Quem decide se foi bem executado é a arquibancada.
 
 ---
 
@@ -48,5 +51,21 @@
 ## PRIORIDADE DE IMPLEMENTAÇÃO
 
 - **Fase 1:** 1 categoria — Aura / Presença. É o público-alvo do lançamento e a mais simples tecnicamente: não exige material nem ferramenta na tela.
+
+### O desafio da Fase 1
+
+```
+### Aura
+**Categoria:** Aura / Presença
+**Regra:** imponha mais presença que o outro, no tempo que a plateia escolher.
+**Tempos:** 30s · 60s · 90s
+**O que o público julga:** quem dominou a tela. Sem critério além disso — é
+  subjetivo de propósito, e é a arquibancada que resolve.
+**Idade mínima:** livre
+**Precisa de material:** não
+**Precisa de música:** não
+```
+
+Sem material e sem música, este desafio não esbarra em licença (`04-leonardo/juridico.md`) nem em nada travado. As regras de conduta valem, como em qualquer duelo.
 - **Fase 2:** 3 a 5 categorias
 - **Fase 3:** as 10

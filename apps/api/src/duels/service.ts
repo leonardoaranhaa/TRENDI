@@ -1,10 +1,14 @@
 import type { Duel, PrismaClient } from '@trendi/db';
+import type { PublishCredential, VideoProvider } from '@trendi/video';
 import {
   applyEvent,
+  stateDurationMs,
   tallySimpleVote,
+  tick,
   type DuelEvent,
   type DuelSnapshot,
   type DuelState,
+  type DuelTransition,
   type Side,
   type SimpleTally,
   type Stand,
@@ -27,7 +31,8 @@ export type DuelProblem =
   | 'nao_e_competidor'
   | 'transicao_invalida'
   | 'votacao_fechada'
-  | 'ja_votou';
+  | 'ja_votou'
+  | 'palco_nao_aberto';
 
 function snapshotOf(duel: Duel): DuelSnapshot {
   return {
@@ -46,6 +51,8 @@ export interface DuelView {
   readonly scoreA: number | null;
   readonly scoreB: number | null;
   readonly countsForRanking: boolean;
+  /** Onde a plateia assiste. Só existe com a composição no ar. */
+  readonly playbackUrl: string | null;
 }
 
 export function duelView(duel: Duel): DuelView {
@@ -58,6 +65,7 @@ export function duelView(duel: Duel): DuelView {
     scoreA: duel.scoreA === null ? null : Number(duel.scoreA),
     scoreB: duel.scoreB === null ? null : Number(duel.scoreB),
     countsForRanking: duel.countsForRanking,
+    playbackUrl: duel.playbackUrl,
   };
 }
 
@@ -73,6 +81,7 @@ export async function applyDuelEvent(
   actorId: string,
   event: DuelEvent,
   now = new Date(),
+  video?: VideoProvider,
 ): Promise<{ duel: DuelView } | { problem: DuelProblem }> {
   const duel = await prisma.duel.findUnique({ where: { id: duelId } });
   if (duel === null) return { problem: 'duelo_nao_encontrado' };
@@ -85,11 +94,33 @@ export async function applyDuelEvent(
     return { problem: 'transicao_invalida' };
   }
 
-  const { transition, snapshot } = resultado;
+  // Estado de duração zero anda sozinho. O ACEITE é assim: o arquivo de
+  // regras o chama de instantâneo, e ele existe para aparecer na auditoria
+  // como ponto de não retorno — não para o duelo ficar parado nele.
+  const transitions: DuelTransition[] = [resultado.transition];
+  let snapshot = resultado.snapshot;
+  for (;;) {
+    const automatica = stateDurationMs(snapshot) === 0 ? tick(snapshot, now.getTime()) : null;
+    if (automatica === null) break;
+    transitions.push(automatica.transition);
+    snapshot = automatica.snapshot;
+  }
 
   // Ao chegar em RESULTADO, o placar sai junto: é o mesmo instante para quem
   // está assistindo, e evita duelo em "resultado" sem resultado.
   const apuracao = snapshot.state === 'result' ? await tallyOf(prisma, duelId) : null;
+
+  // A mídia acompanha o estado: palco no ACEITE, composição na EXECUÇÃO, e
+  // tudo desligado quando o duelo sai do ar. Cada passagem conta — inclusive
+  // as automáticas, senão o palco do ACEITE nunca abriria. Falha de mídia não
+  // trava a transição: o duelo precisa poder ser cancelado com o fornecedor
+  // fora do ar.
+  let midia: MediaPatch = {};
+  if (video !== undefined) {
+    for (const passagem of transitions) {
+      midia = { ...midia, ...(await moveMedia(video, { ...duel, ...midia }, passagem.to)) };
+    }
+  }
 
   const atualizado = await prisma.$transaction(async (tx) => {
     const gravado = await tx.duel.update({
@@ -99,6 +130,7 @@ export async function applyDuelEvent(
         stateEnteredAt: now,
         ...(snapshot.state === 'running' ? { startedAt: now } : {}),
         ...(snapshot.state === 'result' || snapshot.state === 'cancelled' ? { endedAt: now } : {}),
+        ...midia,
         ...(apuracao === null
           ? {}
           : {
@@ -110,17 +142,21 @@ export async function applyDuelEvent(
       },
     });
 
-    await tx.duelTransition.create({
-      data: {
-        duelId,
-        fromState: transition.from,
-        toState: transition.to,
-        event: transition.event,
-        abandonment: transition.abandonment,
-        occurredAt: now,
-        ...(transition.reason === undefined ? {} : { reason: transition.reason }),
-      },
-    });
+    // Toda passagem vira linha, inclusive as automáticas: auditoria com buraco
+    // não é auditoria (convenção 3).
+    for (const passagem of transitions) {
+      await tx.duelTransition.create({
+        data: {
+          duelId,
+          fromState: passagem.from,
+          toState: passagem.to,
+          event: passagem.event,
+          abandonment: passagem.abandonment,
+          occurredAt: now,
+          ...(passagem.reason === undefined ? {} : { reason: passagem.reason }),
+        },
+      });
+    }
 
     return gravado;
   });
@@ -210,4 +246,79 @@ export async function voteStatus(
     yourVote: meu === null ? null : (meu.votedFor as Side),
     tally: encerrado ? await tallyOf(prisma, duelId) : null,
   };
+}
+
+/** O que a mídia precisa virar quando o duelo entra num estado. */
+type MediaPatch = {
+  stageId?: string | null;
+  compositionId?: string | null;
+  playbackUrl?: string | null;
+  recordingUrl?: string | null;
+};
+
+/** O mínimo que a mídia precisa saber do duelo para decidir o que fazer. */
+interface MediaState {
+  readonly id: string;
+  readonly stageId?: string | null;
+  readonly compositionId?: string | null;
+}
+
+async function moveMedia(
+  video: VideoProvider,
+  duel: MediaState,
+  to: DuelState,
+): Promise<MediaPatch> {
+  try {
+    if (to === 'accepted' && (duel.stageId ?? null) === null) {
+      const palco = await video.createStage(duel.id);
+      return { stageId: palco.stageId };
+    }
+
+    if (to === 'running' && duel.stageId != null && (duel.compositionId ?? null) === null) {
+      const composicao = await video.startComposition(duel.stageId);
+      return { compositionId: composicao.compositionId, playbackUrl: composicao.playbackUrl };
+    }
+
+    // Sai do ar em VOTAÇÃO: o que se julga é o que aconteceu, não o que o
+    // competidor faz enquanto a plateia decide.
+    if ((to === 'voting' || to === 'result' || to === 'cancelled') && duel.compositionId != null) {
+      const gravacao = await video.stopComposition(duel.compositionId);
+      const patch: MediaPatch = { compositionId: null, playbackUrl: null };
+      if (gravacao !== null) patch.recordingUrl = gravacao.url;
+      if (to !== 'voting' && duel.stageId != null) await video.closeStage(duel.stageId);
+      return patch;
+    }
+
+    if ((to === 'result' || to === 'cancelled') && duel.stageId != null) {
+      await video.closeStage(duel.stageId);
+    }
+  } catch {
+    // Silêncio de propósito: registrar a transição importa mais do que
+    // desligar o palco. Palco órfão é problema de limpeza; transição perdida
+    // é auditoria furada, e a convenção 3 não abre mão dela.
+    return {};
+  }
+
+  return {};
+}
+
+/**
+ * Credencial para um competidor publicar do navegador.
+ *
+ * Só os dois do duelo pegam credencial, e só depois do ACEITE — antes disso
+ * não há palco, e emitir token para quem não vai duelar é abrir porta à toa.
+ */
+export async function issuePublishCredential(
+  prisma: PrismaClient,
+  video: VideoProvider,
+  duelId: string,
+  actorId: string,
+): Promise<{ credential: PublishCredential } | { problem: DuelProblem }> {
+  const duel = await prisma.duel.findUnique({ where: { id: duelId } });
+  if (duel === null) return { problem: 'duelo_nao_encontrado' };
+  if (actorId !== duel.creatorA && actorId !== duel.creatorB) return { problem: 'nao_e_competidor' };
+  if (duel.stageId === null) return { problem: 'palco_nao_aberto' };
+
+  const side: Side = actorId === duel.creatorA ? 'a' : 'b';
+  return { credential: await video.issuePublishCredential(duel.stageId, side) };
 }

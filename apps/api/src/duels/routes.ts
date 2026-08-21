@@ -3,13 +3,23 @@ import type { PrismaClient } from '@trendi/db';
 import type { DuelEvent, Side } from '@trendi/shared';
 import type { ApiConfig } from '../config.js';
 import { currentUser } from '../auth/session-cookie.js';
-import { applyDuelEvent, castVote, duelView, voteStatus, type DuelProblem } from './service.js';
+import type { VideoProvider } from '@trendi/video';
+import {
+  applyDuelEvent,
+  castVote,
+  duelView,
+  issuePublishCredential,
+  voteStatus,
+  type DuelProblem,
+} from './service.js';
 
 /** Rotas do duelo e da votação simples (C-09). */
 
 interface DuelRoutesOptions {
   readonly config: ApiConfig;
   readonly prisma: PrismaClient;
+  /** Sem fornecedor de mídia, o duelo anda sem vídeo — é o que a Fase 1 faz até L-19. */
+  readonly video?: VideoProvider;
 }
 
 const EVENTS = new Set<DuelEvent>([
@@ -30,10 +40,11 @@ const STATUS: Record<DuelProblem, number> = {
   transicao_invalida: 409,
   votacao_fechada: 409,
   ja_votou: 409,
+  palco_nao_aberto: 409,
 };
 
 export async function duelRoutes(app: FastifyInstance, options: DuelRoutesOptions): Promise<void> {
-  const { config, prisma } = options;
+  const { config, prisma, video } = options;
 
   app.get('/duels/:duelId', async (request, reply) => {
     const { duelId } = request.params as { duelId: string };
@@ -61,11 +72,46 @@ export async function duelRoutes(app: FastifyInstance, options: DuelRoutesOption
       return reply.code(400).send({ error: 'evento_invalido' });
     }
 
-    const resultado = await applyDuelEvent(prisma, duelId, user.id, body.event as DuelEvent);
+    const resultado = await applyDuelEvent(
+      prisma,
+      duelId,
+      user.id,
+      body.event as DuelEvent,
+      new Date(),
+      video,
+    );
     if ('problem' in resultado) {
       return reply.code(STATUS[resultado.problem]).send({ error: resultado.problem });
     }
     return resultado;
+  });
+
+  /**
+   * Credencial para o competidor publicar do navegador (C-03).
+   *
+   * Sai curta e por lado. Quem captura de fato é a tela do competidor, que é
+   * C-04 — aqui é a porta que ela vai usar.
+   */
+  app.post('/duels/:duelId/publish-credential', async (request, reply) => {
+    if (video === undefined) return reply.code(503).send({ error: 'video_indisponivel' });
+
+    const user = await currentUser(prisma, config, request, reply);
+    if (user === null) return reply.code(401).send({ error: 'sem_sessao' });
+
+    const { duelId } = request.params as { duelId: string };
+    const resultado = await issuePublishCredential(prisma, video, duelId, user.id);
+    if ('problem' in resultado) {
+      return reply.code(STATUS[resultado.problem]).send({ error: resultado.problem });
+    }
+
+    return {
+      credential: {
+        side: resultado.credential.side,
+        token: resultado.credential.token,
+        ingestEndpoint: resultado.credential.ingestEndpoint,
+        expiresAt: resultado.credential.expiresAt.toISOString(),
+      },
+    };
   });
 
   app.post('/duels/:duelId/votes', async (request, reply) => {

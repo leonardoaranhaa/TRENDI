@@ -219,6 +219,47 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **Custo da decisão:** senha é superfície de ataque e trabalho contínuo — limite de tentativas, recuperação, e um provedor de e-mail para os links (tarefa L-18). Aceito conscientemente: a alternativa era depender de terceiro para existir.
 
+---
+
+## D-20 — Fornecedor de vídeo: Amazon IVS
+**Data:** 2026-08-20 **Status:** travada (fecha L-03)
+
+**Decisão:** Amazon IVS. Real-Time (stage) para captação dos dois competidores e composição no servidor; Low-Latency Streaming (channel) para a plateia; gravação composta em S3.
+
+**Quem decidiu:** o Leonardo autorizou explicitamente o Claude Code a escolher — "te autorizo a decidir conforme a necessidade". O `CLAUDE.md` proíbe escolher fornecedor de vídeo por conta própria, e essa proibição continua valendo para tudo o que não for esta decisão.
+
+**Por quê, na ordem que pesou:**
+
+1. **Região no Brasil, com preço publicado.** Foi a única candidata em que confirmei presença na América do Sul. O produto é brasileiro e vive de duelo ao vivo. Rotear a mídia para a Virgínia manteria a latência simétrica (a D-01 sobreviveria), mas pioraria a sensação para todo mundo.
+2. **Composição no servidor, gerenciada.** Stage com os dois → composição em grade, que é o split-screen → channel HLS para a audiência. Sem operar encoder, que é o que `stack.md` chama de "preferir gerenciado; o recurso escasso é tempo".
+3. **Gravação sai no caminho** — composite recording para S3 é a matéria-prima dos clipes (`C-21`).
+4. **Um fornecedor só** para mídia, storage e CDN.
+
+**Números levantados, região América do Sul:** participante no stage $0,084/h; composição HD $0,30/h; entrega HD $0,084 por espectador-hora, SD $0,042. Um duelo de 30 minutos com 200 espectadores em HD dá ~$0,25 de captação e composição e ~$8,40 de entrega — **a entrega é 97% da conta**, exatamente como `visao-geral.md` já avisava.
+
+**Descartado: LiveKit Cloud.** Aceita WHIP, é open source (com saída de auto-hospedagem) e a composição dele renderiza uma página web, o que permitiria overlays embutidos no vídeo. Perdeu por não ter presença confirmada na América do Sul — a documentação lista us-east, eu-central e ap-south. Para este produto, é o critério errado de perder. Também descartados: Cloudflare Realtime (não faz composição gerenciada de dois participantes) e os demais candidatos de `04-leonardo/fornecedores.md`, que não somam região no Brasil e composição gerenciada.
+
+**Onde os overlays vivem:** placar e barulhômetro ficam em DOM, sobre o vídeo composto — não queimados no quadro. É melhor para o produto: a D-05 exige que o barulhômetro seja visualmente inconfundível com o placar, e isso se itera em CSS, não em template de composição. Os clipes queimam os overlays na renderização (`C-21`).
+
+**Gatilho de revisão:** quando a entrega passar do patamar que `L-04` vai definir, reavaliar LiveKit auto-hospedado ou CDN própria. A distribuição é HLS nos dois casos, então a troca fica contida na camada de entrega.
+
+**A conferir na criação da conta (`L-19`):** disponibilidade de IVS Real-Time em `sa-east-1`, o comportamento da grade de composição com dois participantes, e os preços — pesquisa de preço envelhece.
+
+---
+
+## D-21 — A plateia julga desempenho; a plataforma julga conduta
+**Data:** 2026-08-20 **Status:** travada (fecha L-06, em forma diferente da prevista)
+
+**Decisão:** a TRENDI não escreve regra sobre o que é um bom desempenho. Escreve três regras de conduta, que valem para todos e em qualquer categoria: **pudor**, **respeito** e **segurança e legalidade**. Estão em `01-conceito/regras-da-plataforma.md`.
+
+**Por quê:** decisão do Leonardo, e ela é coerente com a espinha do produto. O julgamento é da arquibancada — é para isso que existe o voto cruzado (D-02). Regra de plataforma sobre execução de desafio seria a plataforma virando júri, e júri não precisa de arquibancada.
+
+**O que muda em relação ao previsto:** `L-06` era "escrever as regras dos 10 desafios". Cada desafio continua tendo nome, faixa de tempo e critério visível, mas **critério visível não é regra de julgamento**: é a frase que diz à plateia o que ela está julgando. As regras que a plataforma faz cumprir são as três de conduta.
+
+**Cada regra vem com o que ela não proíbe.** Isso é parte da decisão, não redação: regra sem limite escrito vira moderação por gosto pessoal, e no caso da regra de respeito, mataria a provocação entre torcidas — que é o clima que faz o produto existir, e que `servicos.md` já mandava a moderação preservar.
+
+**Consequência no código:** a moderação (`C-22`) implementa três regras, não dez catálogos. Quem é encerrado por infração perde por conduta, não por voto — o placar continua significando desempenho, que é o que o ranking mede.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

@@ -1,7 +1,7 @@
 # STACK TÉCNICA
 
-> O que está em **negrito** já está montado e rodando (C-01). O resto segue
-> proposta — e a camada de vídeo continua travada em L-03.
+> O que está em **negrito** já está montado e rodando. A camada de vídeo tem
+> fornecedor decidido (D-20) e espera a conta AWS (`L-19`) para sair do papel.
 
 Monorepo com npm workspaces, TypeScript em modo estrito, Vitest como runner.
 Ver decisão D-14.
@@ -13,7 +13,7 @@ Ver decisão D-14.
 | Framework | **Next.js 16** (React 19) | SSR para SEO dos clipes e perfis; ecossistema maduro |
 | Estilo | **Tailwind 4** | Velocidade de iteração |
 | Tempo real | **`ws`** (WebSocket nativo) | Chat, barulhômetro, estado do duelo. Socket.io descartado em D-14 |
-| Vídeo | SDK do fornecedor escolhido | Depende de L-03 |
+| Vídeo | **SDK Web do Amazon IVS** | Publicação pelo navegador, sem download — decisão D-20 |
 
 ## Backend
 
@@ -45,7 +45,7 @@ Ver decisão D-14.
 | Cliente web | **Vercel** |
 | API e tempo real | **Fly.io**, região no Brasil — a Vercel não segura WebSocket |
 | Banco | **Supabase** (São Paulo), só o Postgres |
-| Vídeo | **Pendente — L-03** |
+| Vídeo | **Amazon IVS** (Real-Time + Low-Latency Streaming), região São Paulo |
 | Observabilidade | Logs estruturados + monitoramento de erro desde o dia 1 |
 
 Ver decisão D-17 para o porquê de cada uma e o que conferir antes de contratar.

@@ -3,7 +3,7 @@
 > **Atualizar ao fim de toda sessão de trabalho.**
 
 **Última atualização:** 2026-08-20
-**Fase atual:** Fase 0 — Definição *(com a frente técnica da Fase 1 correndo em paralelo, pelo que não depende de bloqueio)*
+**Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
 ---
@@ -16,7 +16,11 @@ O que está sendo trabalhado agora:
 |---|---|---|---|
 | L-01 | Verificar disponibilidade do nome TRENDI | Leonardo | ⬜ |
 | L-02 | Consulta jurídica (monetização, biometria, música) | Leonardo | ⬜ |
-| L-03 | Pesquisa e escolha do fornecedor de vídeo | Leonardo | ⬜ |
+| L-03 | Fornecedor de vídeo: **Amazon IVS** (D-20) | Claude Code, autorizado | ✅ |
+| L-06 | Regras da plataforma: três de conduta (D-21) | Claude Code | ✅ |
+| L-19 | Criar conta AWS e habilitar IVS | Leonardo | ⬜ **nova** |
+| C-03 | Integrar o SDK de vídeo | Claude Code | ✅ |
+| C-04 | Captação WebRTC do navegador | Claude Code | ⬜ próxima |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -33,7 +37,7 @@ O que está sendo trabalhado agora:
 
 | Bloqueio | Trava o quê | Como destravar |
 |---|---|---|
-| L-03 pendente | Toda a camada de vídeo (C-03 a C-06, e C-21) | Rodar a pesquisa comparativa de fornecedores |
+| L-19 pendente | Vídeo de verdade (o código anda com fornecedor falso) | Criar conta AWS, habilitar IVS, guardar credenciais |
 | L-02 pendente | Monetização e verificação etária | Contratar consulta jurídica |
 | L-05 pendente | Pagamentos e contratos | Abrir CNPJ |
 | L-17 pendente | Entrar pelo atalho do Google/Discord e publicar o protótipo (C-36) | Registrar os apps e guardar client id/secret |
@@ -43,9 +47,9 @@ O que está sendo trabalhado agora:
 
 ## DECISÕES AGUARDANDO LEONARDO
 
-0. Registrar os apps OAuth (L-17) e contratar provedor de e-mail (L-18)
+0. Criar a conta AWS (L-19), registrar os apps OAuth (L-17) e contratar provedor de e-mail (L-18)
 1. Confirmar nome definitivo após L-01
-2. Escolher fornecedor de infraestrutura de vídeo após L-03
+2. ~~Escolher fornecedor de vídeo~~ — feito: Amazon IVS (D-20)
 3. Definir se haverá prêmio em dinheiro (recomendação atual: não no lançamento)
 4. Definir split do revenue share com criadores
 
@@ -53,15 +57,15 @@ O que está sendo trabalhado agora:
 
 ## PRÓXIMOS 3 PASSOS
 
-1. **L-03** — pesquisa de fornecedor de vídeo. Continua o bloqueio mais pesado: C-03 a C-07 dependem dele, e agora é ele que separa o repositório de um duelo real.
+1. **L-19** — criar a conta AWS e habilitar o IVS. É o que separa o fornecedor falso do vídeo de verdade.
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-**Do lado do código, a fila da Fase 1 acabou.** Identidade, chat, ciclo do
-duelo e votação estão de pé e testados. O que resta na fase depende de você:
-`L-03` destrava vídeo e estádio, `L-06` destrava o desafio da Aura.
-
-Construir Fase 2 agora seria justamente o que o roadmap manda não fazer.
+**A fila de código voltou a andar.** `C-03` fechou: a camada de mídia existe,
+o palco abre no aceite, a composição sobe na execução e cai quando a votação
+abre. O caminho segue em `C-04` (captação no navegador) → `C-05` → `C-06`, com
+`C-10` em paralelo. Nada disso espera você: enquanto a conta AWS não existe, o
+vídeo roda contra fornecedor falso, como o login já faz.
 
 Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
 OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
@@ -87,6 +91,8 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-20 | C-03: camada de mídia atrás de interface, com fornecedor falso e adaptador IVS (220 testes) | C-04 — captação no navegador |
+| 2026-08-20 | L-03 e L-06 fechadas: fornecedor é Amazon IVS (D-20), e a plataforma passa a ter três regras de conduta (D-21) | C-03 — integrar o SDK |
 | 2026-08-20 | C-09: votação simples, ciclo do duelo persistido e placar revelado só no fim (187 testes) | Fila de código da Fase 1 vazia — segue com L-03 e L-06 |
 | 2026-08-20 | C-07: chat do duelo por WebSocket, com ticket, histórico curto e limite por conta (166 testes) | C-09 (votação simples) |
 | 2026-08-20 | C-37: conta nativa com senha, verificação de e-mail e recuperação — OAuth virou atalho (D-19) | C-07 (chat) — e L-17, L-18 do lado do Leonardo |

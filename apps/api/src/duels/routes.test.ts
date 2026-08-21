@@ -64,9 +64,14 @@ describe('mover o duelo', () => {
 
     const transicoes = await prisma.duelTransition.findMany({
       where: { duelId: duel.id },
-      orderBy: { occurredAt: 'asc' },
+      orderBy: { id: 'asc' },
     });
-    expect(transicoes.map((t) => t.toState)).toEqual(['matched', 'accepted']);
+
+    // O ACEITE é instantâneo (regras do duelo, §1): o duelo passa por ele e
+    // segue para a ESCOLHA sozinho. As duas passagens ficam registradas —
+    // a do aceite é o ponto de não retorno, e sumir com ela seria perder o
+    // que a penalidade usa como marco.
+    expect(transicoes.map((t) => t.toState)).toEqual(['matched', 'accepted', 'choosing']);
     expect(transicoes.every((t) => t.abandonment === false)).toBe(true);
   });
 

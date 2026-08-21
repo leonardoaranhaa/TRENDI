@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { PrismaClient } from '@trendi/db';
+import type { VideoProvider } from '@trendi/video';
 import {
   CHOICE_WINDOW_MS,
   CROSS_VOTE_WEIGHTS,
@@ -19,6 +20,8 @@ import { loadConfig, type ApiConfig } from './config.js';
 
 export interface ServerOptions {
   readonly prisma: PrismaClient;
+  /** Camada de mídia. Ausente: o duelo roda sem vídeo (Fase 1, antes de L-19). */
+  readonly video?: VideoProvider;
   readonly config?: ApiConfig;
   readonly logger?: boolean;
 }
@@ -40,7 +43,11 @@ export function buildServer(options: ServerOptions): FastifyInstance {
   if (config.rateLimitEnabled) app.register(rateLimit, { global: false, max: 100, timeWindow: '1 minute' });
   app.register(authRoutes, { config, prisma: options.prisma });
   app.register(nativeAuthRoutes, { config, prisma: options.prisma });
-  app.register(duelRoutes, { config, prisma: options.prisma });
+  app.register(duelRoutes, {
+    config,
+    prisma: options.prisma,
+    ...(options.video === undefined ? {} : { video: options.video }),
+  });
 
   app.get('/health', () => ({ status: 'ok', service: 'api' }));
 
