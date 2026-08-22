@@ -2,7 +2,7 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** 2026-08-20
+**Última atualização:** 2026-08-21
 **Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
@@ -20,7 +20,8 @@ O que está sendo trabalhado agora:
 | L-06 | Regras da plataforma: três de conduta (D-21) | Claude Code | ✅ |
 | L-19 | Criar conta AWS e habilitar IVS | Leonardo | ⬜ **nova** |
 | C-03 | Integrar o SDK de vídeo | Claude Code | ✅ |
-| C-04 | Captação WebRTC do navegador | Claude Code | ⬜ próxima |
+| C-04 | Captação WebRTC do navegador | Claude Code | ✅ |
+| C-05 | Composição split-screen no servidor | Claude Code | ⬜ próxima |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -61,11 +62,11 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-**A fila de código voltou a andar.** `C-03` fechou: a camada de mídia existe,
-o palco abre no aceite, a composição sobe na execução e cai quando a votação
-abre. O caminho segue em `C-04` (captação no navegador) → `C-05` → `C-06`, com
-`C-10` em paralelo. Nada disso espera você: enquanto a conta AWS não existe, o
-vídeo roda contra fornecedor falso, como o login já faz.
+**A fila de código segue andando.** `C-04` fechou: o competidor liga a câmera
+pelo navegador, sem instalar nada — e isso agora é verificado por teste de
+navegador de verdade, com câmera falsa, não por opinião. O caminho segue em
+`C-05` (composição) → `C-06` (estádio), com `C-10` em paralelo. Nada espera
+você: sem a conta AWS, a tela roda em modo local e diz isso na cara.
 
 Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
 OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
@@ -91,6 +92,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-21 | C-04: tela do competidor, captação sem download, modo local e 5 testes de navegador (233 + 5) | C-05 — composição |
 | 2026-08-20 | C-03: camada de mídia atrás de interface, com fornecedor falso e adaptador IVS (220 testes) | C-04 — captação no navegador |
 | 2026-08-20 | L-03 e L-06 fechadas: fornecedor é Amazon IVS (D-20), e a plataforma passa a ter três regras de conduta (D-21) | C-03 — integrar o SDK |
 | 2026-08-20 | C-09: votação simples, ciclo do duelo persistido e placar revelado só no fim (187 testes) | Fila de código da Fase 1 vazia — segue com L-03 e L-06 |

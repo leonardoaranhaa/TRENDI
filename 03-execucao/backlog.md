@@ -30,7 +30,7 @@
 | C-01 | Montar repositório, stack base, convenções | C | ✅ | — |
 | C-02 | Identidade: cadastro, login, perfil mínimo | C | ✅ | C-01 |
 | C-03 | Integrar SDK do fornecedor de vídeo | C | ✅ | — |
-| C-04 | Captação WebRTC do navegador (sem download) | C | ⬜ | C-03 |
+| C-04 | Captação WebRTC do navegador (sem download) | C | ✅ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ⬜ | C-04 |
 | C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
 | C-07 | Chat único por WebSocket | C | ✅ | C-01 |

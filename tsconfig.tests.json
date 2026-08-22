@@ -5,7 +5,13 @@
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["packages/*/src/**/*.test.ts", "apps/*/src/**/*.test.ts", "vitest.config.mts"]
+  "include": [
+    "packages/*/src/**/*.test.ts",
+    "apps/*/src/**/*.test.ts",
+    "vitest.config.mts"
+  ]
 }
