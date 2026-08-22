@@ -105,6 +105,13 @@ jobs:
       - name: Cliente do Prisma
         run: npm run generate -w @trendi/db
 
+      # O cliente web importa @trendi/shared, que só existe compilado. Sem
+      # este passo o build do Next não acha o pacote — e foi exatamente
+      # assim que este job falhou da primeira vez, porque na máquina de quem
+      # escreveu o `dist` já estava lá de outra rodada.
+      - name: Pacotes compartilhados
+        run: npx tsc --build
+
       - name: Navegador
         run: npx playwright install --with-deps chromium
 
