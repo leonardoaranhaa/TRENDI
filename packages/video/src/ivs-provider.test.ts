@@ -129,6 +129,33 @@ describe('composição', () => {
     });
   });
 
+  it('fixa o lado pelo atributo do participante — A à esquerda, sempre', async () => {
+    const { client, enviados } = clienteFalso({
+      StartCompositionCommand: { composition: { arn: 'arn:comp:1' } },
+    });
+
+    await new IvsVideoProvider(client, CONFIG).startComposition('arn:stage:1');
+
+    // Sem isto a ordem seria a de chegada ao palco, e o lado A apareceria à
+    // esquerda num duelo e à direita no seguinte. O atributo é o mesmo que a
+    // credencial de publicação grava.
+    expect(enviados[0]?.input['layout']).toMatchObject({
+      grid: { participantOrderAttribute: 'side' },
+    });
+  });
+
+  it('preenche o lado cortando, em vez de deixar tarja preta', async () => {
+    const { client, enviados } = clienteFalso({
+      StartCompositionCommand: { composition: { arn: 'arn:comp:1' } },
+    });
+
+    await new IvsVideoProvider(client, CONFIG).startComposition('arn:stage:1');
+
+    expect(enviados[0]?.input['layout']).toMatchObject({
+      grid: { videoFillMode: 'COVER', videoAspectRatio: 'VIDEO' },
+    });
+  });
+
   it('desliga pelo ARN da composição', async () => {
     const { client, enviados } = clienteFalso({ StopCompositionCommand: {} });
 

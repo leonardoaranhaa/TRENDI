@@ -24,6 +24,8 @@ Duelo de 30 min com 200 espectadores em HD: ~$0,25 de captação e composição,
 - [ ] Criar a conta AWS e habilitar IVS
 - [ ] Confirmar que IVS Real-Time atende em `sa-east-1` (São Paulo)
 - [ ] Confirmar o comportamento da grade de composição com dois participantes
+- [ ] **Criar a *encoder configuration*: 1280×720, 16:9, ~2.500 kbps, 30 fps.** É ela que fixa a qualidade da composição, e 720p é a mitigação de custo já decidida — a entrega é 97% da conta. O ARN vai em `IVS_ENCODER_CONFIGURATION_ARN`.
+- [ ] **Confirmar que o lado A aparece à esquerda.** O código manda `participantOrderAttribute: 'side'`, com `'a'` e `'b'` gravados na credencial. O teste prova que mandamos o parâmetro; só a AWS respondendo prova a ordem. Se vier invertido, é uma linha — mas precisa ser vista.
 - [ ] Conferir os preços acima — pesquisa de preço envelhece
 - [ ] Guardar as credenciais como variável de ambiente (nunca no repo)
 

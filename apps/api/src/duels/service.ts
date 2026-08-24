@@ -303,6 +303,44 @@ async function moveMedia(
 }
 
 /**
+ * Sobe a composição de um duelo que está rodando sem ela (C-05).
+ *
+ * Isso acontece quando a mídia falha na transição para EXECUÇÃO: a transição
+ * segue assim mesmo, porque auditoria vale mais que palco, e o duelo fica no
+ * ar **sem ninguém poder assistir**. Não há agendador nesta fase — ele é a
+ * C-16 —, então a segunda chance acontece no próximo momento em que alguém
+ * bate na API por causa deste duelo, que é o competidor pedindo credencial.
+ */
+async function garantirComposicao(
+  prisma: PrismaClient,
+  video: VideoProvider,
+  duel: Duel,
+): Promise<void> {
+  if (duel.state !== 'running') return;
+  if (duel.compositionId !== null || duel.stageId === null) return;
+
+  try {
+    const composicao = await video.startComposition(duel.stageId);
+
+    // Os dois competidores podem pedir credencial ao mesmo tempo, e o duelo
+    // pode ter saído de EXECUÇÃO enquanto a composição subia. Quem perder a
+    // corrida desliga o que acabou de ligar: duas composições no ar custam
+    // dobrado e entregam dois quadros diferentes para a mesma plateia.
+    const { count } = await prisma.duel.updateMany({
+      where: { id: duel.id, state: 'running', compositionId: null },
+      data: {
+        compositionId: composicao.compositionId,
+        playbackUrl: composicao.playbackUrl,
+      },
+    });
+    if (count === 0) await video.stopComposition(composicao.compositionId);
+  } catch {
+    // Mesmo silêncio do `moveMedia`: sem composição o duelo ainda anda, e a
+    // credencial que o competidor pediu não depende dela.
+  }
+}
+
+/**
  * Credencial para um competidor publicar do navegador.
  *
  * Só os dois do duelo pegam credencial, e só depois do ACEITE — antes disso
@@ -318,6 +356,8 @@ export async function issuePublishCredential(
   if (duel === null) return { problem: 'duelo_nao_encontrado' };
   if (actorId !== duel.creatorA && actorId !== duel.creatorB) return { problem: 'nao_e_competidor' };
   if (duel.stageId === null) return { problem: 'palco_nao_aberto' };
+
+  await garantirComposicao(prisma, video, duel);
 
   const side: Side = actorId === duel.creatorA ? 'a' : 'b';
   return { credential: await video.issuePublishCredential(duel.stageId, side) };

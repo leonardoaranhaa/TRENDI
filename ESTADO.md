@@ -2,7 +2,7 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** 2026-08-21
+**Última atualização:** 2026-08-24
 **Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
@@ -21,7 +21,8 @@ O que está sendo trabalhado agora:
 | L-19 | Criar conta AWS e habilitar IVS | Leonardo | ⬜ **nova** |
 | C-03 | Integrar o SDK de vídeo | Claude Code | ✅ |
 | C-04 | Captação WebRTC do navegador | Claude Code | ✅ |
-| C-05 | Composição split-screen no servidor | Claude Code | ⬜ próxima |
+| C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
+| C-06 | Sala de duelo: página do estádio | Claude Code | ⬜ próxima |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -62,11 +63,17 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-**A fila de código segue andando.** `C-04` fechou: o competidor liga a câmera
-pelo navegador, sem instalar nada — e isso agora é verificado por teste de
-navegador de verdade, com câmera falsa, não por opinião. O caminho segue em
-`C-05` (composição) → `C-06` (estádio), com `C-10` em paralelo. Nada espera
-você: sem a conta AWS, a tela roda em modo local e diz isso na cara.
+**A fila de código segue andando.** `C-05` fechou: o quadro do duelo agora
+tem lado fixo — A à esquerda, B à direita, em todo duelo (D-22). Sem isso a
+ordem seria a de chegada, e o placar em DOM sobre o vídeo passaria a apontar
+para o competidor errado. O caminho segue em `C-06` (estádio), com `C-10` em
+paralelo. Nada espera você: sem a conta AWS, a tela roda em modo local e diz
+isso na cara.
+
+**Entrou item no seu `L-19`:** criar a *encoder configuration* de 720p (é ela
+que fixa a qualidade e o custo da entrega) e conferir, com a conta na mão, que
+o lado A aparece mesmo à esquerda. O código manda o parâmetro certo; só a AWS
+respondendo prova a ordem.
 
 Do seu lado entraram duas tarefas rápidas: **L-17** (registrar os apps de
 OAuth) e **L-18** (provedor de e-mail). Nenhuma das duas trava código — a
@@ -92,6 +99,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-24 | C-05: quadro do duelo com lado fixo, qualidade escrita e segunda chance para a composição (238 testes) | C-06 — estádio |
 | 2026-08-21 | C-04: tela do competidor, captação sem download, modo local e 5 testes de navegador (233 + 5) | C-05 — composição |
 | 2026-08-20 | C-03: camada de mídia atrás de interface, com fornecedor falso e adaptador IVS (220 testes) | C-04 — captação no navegador |
 | 2026-08-20 | L-03 e L-06 fechadas: fornecedor é Amazon IVS (D-20), e a plataforma passa a ter três regras de conduta (D-21) | C-03 — integrar o SDK |

@@ -34,6 +34,34 @@ export interface PublishCredential {
   readonly ingestEndpoint: string;
 }
 
+/**
+ * Como o quadro do duelo é montado (C-05).
+ *
+ * Isto é regra de produto, não detalhe de fornecedor — por isso mora aqui, e
+ * não dentro do adaptador do IVS. Trocar de fornecedor (a D-20 já prevê o
+ * gatilho) é traduzir estas quatro linhas para o vocabulário do próximo.
+ */
+export const COMPOSITION_LAYOUT = {
+  /**
+   * Atributo do participante que decide a ordem dos lados: **A à esquerda,
+   * B à direita, em todo duelo**. Sem isso a ordem é de chegada — quem
+   * conectar primeiro fica na esquerda —, e aí "o da esquerda" deixa de
+   * significar alguma coisa para quem assiste. Pior: placar e barulhômetro
+   * ficam em DOM sobre o vídeo (D-20), fixos por lado, e passariam a apontar
+   * para o competidor errado.
+   */
+  orderBy: 'side',
+  /**
+   * Câmera cortada continua ocupando o lado dela. Sumir com metade da tela
+   * no meio do duelo confunde mais do que a câmera parada.
+   */
+  keepStoppedSide: true,
+  /** Split-screen colado: sem faixa separando os dois. */
+  gap: 0,
+  /** Corta para preencher o lado, em vez de deixar tarja preta em volta. */
+  fill: 'cover',
+} as const;
+
 export interface CompositionHandle {
   readonly compositionId: string;
   /** URL de reprodução para a plateia, em HLS. */

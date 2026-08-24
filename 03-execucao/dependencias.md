@@ -12,7 +12,7 @@ Este arquivo existe por um motivo: em projeto solo, o gargalo quase nunca é có
 L-03 (fornecedor de vídeo) ✅ Amazon IVS, decisão D-20
   └─→ C-03 (SDK) ✅
         └─→ C-04 (captação WebRTC) ✅
-              └─→ C-05 (composição split-screen)
+              └─→ C-05 (composição split-screen) ✅
                     ├─→ C-06 (sala de duelo)
                     └─→ C-21 (clipes)
                           └─→ C-29 (clipes premium)
