@@ -18,7 +18,8 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['packages/*/src/**/*.test.ts', 'apps/*/src/**/*.test.ts'],
+    // O cliente web não tem `src/`: o código dele vive em `app/` e `lib/`.
+    include: ['packages/*/src/**/*.test.ts', 'apps/*/src/**/*.test.ts', 'apps/web/lib/**/*.test.ts'],
     // Postgres em memória sobe uma vez por arquivo de teste; o padrão de 5s
     // não cobre isso.
     testTimeout: 30_000,

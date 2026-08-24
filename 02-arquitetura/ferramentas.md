@@ -14,7 +14,8 @@ Este arquivo é instrução de construção: fica **só no repo**, não vai para
 | `.claude/hooks/lembrete-sync.sh` | **Stop**: ao fim da resposta, avisa quais arquivos precisam de re-upload no Projeto. Fala uma vez por conjunto de mudanças; não repete. |
 | `.claude/commands/` | `/estado`, `/tarefa <ID>`, `/fechar` — o fluxo do README virado comando. |
 | `.mcp.json` | Servidores MCP do projeto. Hoje: só o GitHub. |
-| `.github/workflows/verificar.yml` | Em cada PR: valida o manifesto, a sintaxe dos scripts e o pacote de sincronia. |
+| `.github/workflows/verificar.yml` | Em cada PR: manifesto e scripts, depois tipos e testes contra Postgres de verdade, e por fim a captação num navegador de verdade. |
+| `playwright.config.ts` | Teste de navegador com câmera falsa. `npm run test:navegador`. Nesta máquina, aponte `CHROMIUM_EXECUTAVEL` para o Chromium já instalado em `/opt/pw-browsers`. |
 
 ### Permissões
 

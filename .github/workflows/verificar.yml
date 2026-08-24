@@ -85,3 +85,35 @@ jobs:
 
       - name: Build do cliente web
         run: npm run build -w @trendi/web
+
+  navegador:
+    runs-on: ubuntu-latest
+
+    # A captação do competidor é o princípio nº 4 do projeto — sem download.
+    # Isso não se verifica com teste de unidade: precisa de navegador de
+    # verdade, com câmera de mentira ligada por flag.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cliente do Prisma
+        run: npm run generate -w @trendi/db
+
+      # O cliente web importa @trendi/shared, que só existe compilado. Sem
+      # este passo o build do Next não acha o pacote — e foi exatamente
+      # assim que este job falhou da primeira vez, porque na máquina de quem
+      # escreveu o `dist` já estava lá de outra rodada.
+      - name: Pacotes compartilhados
+        run: npx tsc --build
+
+      - name: Navegador
+        run: npx playwright install --with-deps chromium
+
+      - name: Captação no navegador
+        run: npm run test:navegador

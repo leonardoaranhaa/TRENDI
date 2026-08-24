@@ -14,7 +14,7 @@ import type {
   Recording,
   VideoProvider,
 } from './provider.js';
-import { VideoProviderError } from './provider.js';
+import { COMPOSITION_LAYOUT, VideoProviderError } from './provider.js';
 
 /**
  * Amazon IVS (decisão D-20).
@@ -51,6 +51,9 @@ export interface IvsVideoProviderConfig {
 
 /** Curto de propósito: o token vale para entrar, não para ficar guardado. */
 const DEFAULT_TOKEN_MINUTES = 10;
+
+/** O preenchimento do contrato, no vocabulário do IVS. */
+const FILL_MODE = { cover: 'COVER', contain: 'CONTAIN' } as const;
 
 export class IvsVideoProvider implements VideoProvider {
   readonly name = 'ivs';
@@ -125,14 +128,18 @@ export class IvsVideoProvider implements VideoProvider {
         this.client.send(
           new StartCompositionCommand({
             stageArn: stageId,
+            // Grade de dois é o split-screen. O que cada campo significa está
+            // em `COMPOSITION_LAYOUT`; aqui é só a tradução para o IVS.
             layout: {
-              // Grade de dois é o split-screen. `omitStoppedVideo` falso mantém o
-              // lado de quem caiu na tela: sumir com metade do quadro no meio do
-              // duelo confunde mais do que a câmera parada.
               grid: {
-                gridGap: 0,
-                omitStoppedVideo: false,
+                gridGap: COMPOSITION_LAYOUT.gap,
+                omitStoppedVideo: !COMPOSITION_LAYOUT.keepStoppedSide,
                 videoAspectRatio: 'VIDEO',
+                videoFillMode: FILL_MODE[COMPOSITION_LAYOUT.fill],
+                // O atributo vem do token de publicação, onde `side` já é
+                // gravado como 'a' ou 'b'. É este parâmetro que torna o lado
+                // determinístico em vez de depender de quem conectou antes.
+                participantOrderAttribute: COMPOSITION_LAYOUT.orderBy,
               },
             },
             destinations: [

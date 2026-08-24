@@ -2,7 +2,7 @@
   "name": "@trendi/web",
   "version": "0.0.0",
   "private": true,
-  "description": "Cliente web: est\u00e1dio, chats, vota\u00e7\u00e3o, capta\u00e7\u00e3o WebRTC",
+  "description": "Cliente web: estádio, chats, votação, captação WebRTC",
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@trendi/shared": "*",
+    "amazon-ivs-web-broadcast": "^1.38.1",
     "next": "^16.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

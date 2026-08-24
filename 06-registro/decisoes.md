@@ -260,6 +260,17 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **Consequência no código:** a moderação (`C-22`) implementa três regras, não dez catálogos. Quem é encerrado por infração perde por conduta, não por voto — o placar continua significando desempenho, que é o que o ranking mede.
 
+## D-22 — O quadro do duelo tem lado fixo
+**Data:** 2026-08-24 **Status:** travada
+
+**Decisão:** o lado A ocupa a esquerda e o lado B a direita, em **todo** duelo. A ordem não depende de quem conectou primeiro. A regra mora em `COMPOSITION_LAYOUT`, no contrato de `@trendi/video`, junto com as outras três de montagem do quadro: lado parado continua na tela, sem faixa entre os dois, cortando para preencher.
+
+**Por quê:** a composição em grade, sem ordenação explícita, ordena por chegada ao palco. Isso quebra três coisas ao mesmo tempo. A plateia perde a referência — "o da esquerda" deixa de significar alguém. Placar e barulhômetro ficam em DOM sobre o vídeo (D-20) e são fixos por lado: com o vídeo trocando, o overlay passa a apontar para o competidor errado, e aí o placar mente. E o clipe (`C-21`) herda o defeito, que é justamente o que sai da plataforma para as outras redes.
+
+**Onde a regra fica:** no contrato do fornecedor, não no adaptador. A D-20 nasceu com gatilho de revisão escrito; quando ele disparar, trocar de fornecedor deve ser traduzir estas quatro linhas, não redescobrir a regra.
+
+**O que ainda não está provado:** que o IVS de fato coloca `'a'` à esquerda. O teste prova que mandamos `participantOrderAttribute: 'side'`; a ordem só a AWS responde, e a conta existe depois de `L-19` — onde isso virou item de checklist.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```
