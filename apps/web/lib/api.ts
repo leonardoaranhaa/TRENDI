@@ -96,10 +96,20 @@ export interface SituacaoDaVotacao {
   tally: { winner: string; shareA: number; shareB: number } | null;
 }
 
+/** O desafio da vez. Nulo até o duelo entrar em ESCOLHA. */
+export interface Desafio {
+  name: string;
+  rules: string;
+  /** O que a plateia está julgando — não é regra, é a frase que orienta. */
+  judgingCriteria: string;
+  durationS: number | null;
+}
+
 /** O duelo inteiro, como o estádio precisa dele. */
 export interface DueloNoAr {
   duel: DuelView;
   competitors: { a: Competidor; b: Competidor };
+  challenge: Desafio | null;
   voting: SituacaoDaVotacao;
 }
 

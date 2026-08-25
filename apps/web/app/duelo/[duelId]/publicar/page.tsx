@@ -45,5 +45,25 @@ export default async function Publicar({ params }: { params: Promise<{ duelId: s
     );
   }
 
-  return moldura(<PublicarCliente duelId={duelId} side={side} estadoInicial={duel.state} />);
+  // Quem vai executar precisa ler o desafio antes de ligar a câmera — e o
+  // tempo, que é o que define a dificuldade.
+  return moldura(
+    <>
+      {dados.challenge !== null && (
+        <div className="flex flex-col gap-1 rounded-xl border border-traco bg-noite px-4 py-3">
+          <div className="flex items-baseline gap-3">
+            <span className="voz-da-marca text-[0.6rem] text-eletrico">Seu desafio</span>
+            <span className="text-base font-semibold">{dados.challenge.name}</span>
+            {dados.challenge.durationS !== null && (
+              <span className="voz-da-marca text-[0.6rem] text-tinta-fraca">
+                {dados.challenge.durationS}s
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-tinta-fraca">{dados.challenge.rules}</p>
+        </div>
+      )}
+      <PublicarCliente duelId={duelId} side={side} estadoInicial={duel.state} />
+    </>,
+  );
 }

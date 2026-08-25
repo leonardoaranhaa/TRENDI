@@ -24,7 +24,7 @@ O que está sendo trabalhado agora:
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
 | C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
 | C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ✅ **nova** |
-| C-10 | Desafio fixo da categoria Aura | Claude Code | ⬜ próxima |
+| C-10 | Desafio fixo da categoria Aura | Claude Code | ✅ **nova** |
 | C-39 | Identidade da marca aplicada ao cliente web | Claude Code | ✅ **nova** |
 | L-20 | Enviar o logotipo em vetor (SVG) | Leonardo | ⬜ **nova** |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
@@ -78,8 +78,16 @@ transação que grava a transição (D-26) — então a janela de votação abre
 mesmo instante para todo mundo, que é o que a legitima. Está provado em
 navegador: a tela vira de EXECUÇÃO para VOTAÇÃO sem recarregar.
 
-O caminho segue em `C-10` (o desafio da categoria Aura). Nada espera você:
-sem a conta AWS, a tela diz na cara que não há vídeo saindo dali.
+**A `C-10` fechou:** o duelo agora tem desafio. A tabela `challenges` existia
+desde a `C-01` e estava vazia — o estádio dizia "no ar agora" sem dizer *o
+quê*, e a plateia julgava desempenho sem saber o que estava sendo executado.
+Agora o desafio da Fase 1 (Aura / Presença, do catálogo) entra no duelo ao
+chegar em ESCOLHA, com 60s — a opção do meio, porque escolher pelo público é
+a `C-19`. De quebra, a EXECUÇÃO passou a ter duração: é o que a `C-16` vai
+agendar.
+
+Nada espera você: sem a conta AWS, a tela diz na cara que não há vídeo
+saindo dali.
 
 **A plataforma agora tem a cara da marca (D-25).** Preto de verdade, azul
 `#0132FF` e Montserrat, com o escuro subindo em azul-noite — nada de cinza
@@ -125,6 +133,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-25 | C-10: o duelo ganha o desafio da Fase 1 (Aura), com tempo, e as telas mostram o que a plateia julga (272 testes + 17 de navegador) | C-16 ou C-11 |
 | 2026-08-25 | C-38: o aviso de estado atravessa da API ao tempo real pelo Postgres, dentro da transação (D-26) | C-10 — desafio Aura |
 | 2026-08-25 | C-39: identidade da marca aplicada ao cliente web — paleta, tipografia, logotipo e os lados do duelo (258 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-06: estádio — visitante assiste, chat conectado, voto na tela e placar só no fim (255 testes + 15 de navegador) | C-38 — aviso de estado |

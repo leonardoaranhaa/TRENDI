@@ -34,6 +34,15 @@ const COMPETIDORES = {
   b: { id: 'competidor-b', handle: 'rival', displayName: 'Rival', avatarUrl: null },
 };
 
+/** O desafio da Fase 1, como a migração o semeia (C-10). */
+const DESAFIO = {
+  name: 'Aura',
+  rules: 'Imponha mais presença que o outro, no tempo que a plateia escolher.',
+  judgingCriteria:
+    'Quem dominou a tela. Sem critério além disso — é subjetivo de propósito, e é a arquibancada que resolve.',
+  durationS: 60,
+};
+
 const base = {
   creatorA: COMPETIDORES.a.id,
   creatorB: COMPETIDORES.b.id,
@@ -121,6 +130,8 @@ const servidor = createServer(async (requisicao, resposta) => {
     return responder(200, {
       duel,
       competitors: COMPETIDORES,
+      // Nulo antes da ESCOLHA, como na API de verdade.
+      challenge: duel.state === 'queued' || duel.state === 'matched' ? null : DESAFIO,
       voting: {
         state: duel.state,
         voters: votos.size,

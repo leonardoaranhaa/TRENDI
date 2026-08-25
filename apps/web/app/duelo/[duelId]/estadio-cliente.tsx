@@ -41,7 +41,7 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const chatRef = useRef<Chat | null>(null);
 
-  const { duel, competitors, voting } = dados;
+  const { duel, competitors, challenge, voting } = dados;
   const situacao = situacaoDaPlateia(duel.state as never, {
     logado: eu !== null,
     jaVotou: voting.yourVote,
@@ -150,6 +150,31 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
         <p className="text-tinta-fraca" data-testid="chamada">
           {situacao.chamada}
         </p>
+
+        {/* O desafio precisa estar na cara: a plateia julga desempenho, e
+            desempenho em quê é a pergunta que o voto responde. O critério
+            não é regra que a plataforma faz cumprir (D-21) — é a frase que
+            diz à arquibancada o que ela está julgando. */}
+        {challenge !== null && (
+          <div
+            className="mt-2 flex flex-col gap-1 rounded-xl border border-traco bg-noite px-4 py-3"
+            data-testid="desafio"
+          >
+            <div className="flex items-baseline gap-3">
+              <span className="voz-da-marca text-[0.6rem] text-eletrico">Desafio</span>
+              <span className="text-base font-semibold">{challenge.name}</span>
+              {challenge.durationS !== null && (
+                <span className="voz-da-marca text-[0.6rem] text-tinta-fraca" data-testid="tempo">
+                  {challenge.durationS}s
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-tinta-fraca">{challenge.rules}</p>
+            <p className="text-sm text-tinta-fraca">
+              <span className="text-branco">A plateia julga:</span> {challenge.judgingCriteria}
+            </p>
+          </div>
+        )}
         <span className="hidden" data-testid="estado">
           {duel.state}
         </span>

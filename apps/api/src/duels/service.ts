@@ -1,4 +1,4 @@
-import type { Duel, PrismaClient, User } from '@trendi/db';
+import type { Challenge, Duel, PrismaClient, User } from '@trendi/db';
 import type { PublishCredential, VideoProvider } from '@trendi/video';
 import {
   DUEL_STATE_CHANNEL,
@@ -83,6 +83,30 @@ export interface CompetitorView {
   readonly avatarUrl: string | null;
 }
 
+/**
+ * O desafio como a plateia o vê (C-10).
+ *
+ * `judgingCriteria` **não é regra que a plataforma faz cumprir** — é a frase
+ * que diz à arquibancada o que ela está julgando (D-21). Quem faz cumprir
+ * são as três regras de conduta.
+ */
+export interface ChallengeView {
+  readonly name: string;
+  readonly rules: string;
+  readonly judgingCriteria: string;
+  /** Quanto tempo a execução vai durar, em segundos. */
+  readonly durationS: number | null;
+}
+
+export function challengeView(challenge: Challenge, chosenDurationS: number | null): ChallengeView {
+  return {
+    name: challenge.name,
+    rules: challenge.rules,
+    judgingCriteria: challenge.judgingCriteria,
+    durationS: chosenDurationS,
+  };
+}
+
 export function competitorView(user: User): CompetitorView {
   return {
     id: user.id,
@@ -133,6 +157,15 @@ export async function applyDuelEvent(
   // está assistindo, e evita duelo em "resultado" sem resultado.
   const apuracao = snapshot.state === 'result' ? await tallyOf(prisma, duelId) : null;
 
+  // O duelo ganha desafio ao entrar em ESCOLHA (C-10). Não há rota de
+  // criação de duelo — matchmaking é Fase 2 —, então este é o momento certo:
+  // o estado existe para escolher, e a Fase 1 escolhe sozinha porque só há
+  // uma categoria. Quem escolhe de verdade é o público, na C-19.
+  const desafio =
+    transitions.some((passagem) => passagem.to === 'choosing') && duel.challengeId === null
+      ? await desafioDaVez(prisma)
+      : null;
+
   // A mídia acompanha o estado: palco no ACEITE, composição na EXECUÇÃO, e
   // tudo desligado quando o duelo sai do ar. Cada passagem conta — inclusive
   // as automáticas, senão o palco do ACEITE nunca abriria. Falha de mídia não
@@ -153,6 +186,9 @@ export async function applyDuelEvent(
         stateEnteredAt: now,
         ...(snapshot.state === 'running' ? { startedAt: now } : {}),
         ...(snapshot.state === 'result' || snapshot.state === 'cancelled' ? { endedAt: now } : {}),
+        ...(desafio === null
+          ? {}
+          : { challengeId: desafio.challengeId, chosenDurationS: desafio.durationS }),
         ...midia,
         ...(apuracao === null
           ? {}
@@ -283,6 +319,30 @@ export async function voteStatus(
     yourVote: meu === null ? null : (meu.votedFor as Side),
     tally: encerrado ? await tallyOf(prisma, duelId) : null,
   };
+}
+
+/**
+ * O desafio que o duelo vai executar, e por quanto tempo (C-10).
+ *
+ * A Fase 1 lança com uma categoria só — Aura / Presença —, então não há o que
+ * sortear: é o desafio ativo. O tempo é a **opção do meio** das que o
+ * catálogo oferece: escolher pelo público é a C-19, e até lá o meio é o que
+ * não distorce — nem o mais fácil, nem o mais difícil.
+ *
+ * Sem desafio ativo no banco, o duelo anda sem desafio, como andava antes.
+ * Ficar preso porque a semente não rodou seria pior do que a tela dizer menos.
+ */
+async function desafioDaVez(
+  prisma: PrismaClient,
+): Promise<{ challengeId: string; durationS: number } | null> {
+  const desafio = await prisma.challenge.findFirst({ where: { active: true } });
+  if (desafio === null) return null;
+
+  const opcoes = desafio.durationOptionsS;
+  const meio = opcoes[Math.floor(opcoes.length / 2)];
+  if (meio === undefined) return null;
+
+  return { challengeId: desafio.id, durationS: meio };
 }
 
 /** O que a mídia precisa virar quando o duelo entra num estado. */

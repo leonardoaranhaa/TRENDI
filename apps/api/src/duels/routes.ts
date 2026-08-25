@@ -7,6 +7,7 @@ import type { VideoProvider } from '@trendi/video';
 import {
   applyDuelEvent,
   castVote,
+  challengeView,
   competitorView,
   duelView,
   issuePublishCredential,
@@ -60,7 +61,7 @@ export async function duelRoutes(app: FastifyInstance, options: DuelRoutesOption
     const { duelId } = request.params as { duelId: string };
     const duel = await prisma.duel.findUnique({
       where: { id: duelId },
-      include: { userA: true, userB: true },
+      include: { userA: true, userB: true, challenge: true },
     });
     if (duel === null) return reply.code(404).send({ error: 'duelo_nao_encontrado' });
 
@@ -71,6 +72,10 @@ export async function duelRoutes(app: FastifyInstance, options: DuelRoutesOption
     return {
       duel: duelView(duel),
       competitors: { a: competitorView(duel.userA), b: competitorView(duel.userB) },
+      // Nulo até o duelo entrar em ESCOLHA. A plateia precisa saber o que
+      // está julgando — sem isso o voto mede o quê?
+      challenge:
+        duel.challenge === null ? null : challengeView(duel.challenge, duel.chosenDurationS),
       voting: status,
     };
   });

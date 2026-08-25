@@ -131,3 +131,16 @@ test('a tela vira de execução para votação sem recarregar (C-38)', async ({ 
   await expect(page.getByTestId('estado')).toContainText('voting');
   await expect(page.getByTestId('votar-a')).toBeVisible();
 });
+
+test('mostra o desafio e o tempo — é o que a plateia está julgando (C-10)', async ({ page }) => {
+  await page.goto('/duelo/duelo-no-ar');
+
+  const desafio = page.getByTestId('desafio');
+  await expect(desafio).toContainText('Aura');
+  await expect(desafio).toContainText('presença');
+  // O critério não é regra que a plataforma faz cumprir (D-21): é a frase
+  // que diz à arquibancada o que ela está julgando.
+  await expect(desafio).toContainText('dominou a tela');
+  await expect(page.getByTestId('tempo')).toContainText('60s');
+});
+
