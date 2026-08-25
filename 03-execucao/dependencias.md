@@ -13,7 +13,7 @@ L-03 (fornecedor de vídeo) ✅ Amazon IVS, decisão D-20
   └─→ C-03 (SDK) ✅
         └─→ C-04 (captação WebRTC) ✅
               └─→ C-05 (composição split-screen) ✅
-                    ├─→ C-06 (sala de duelo) ✅ ─→ C-38 (aviso de estado)
+                    ├─→ C-06 (sala de duelo) ✅ ─→ C-38 (aviso de estado) ✅
                     └─→ C-21 (clipes)
                           └─→ C-29 (clipes premium)
 ```

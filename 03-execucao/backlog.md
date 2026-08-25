@@ -38,7 +38,7 @@
 | C-09 | Votação simples (sem peso cruzado) | C | ✅ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | — |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
-| C-38 | A API avisa o tempo real quando o duelo muda de estado | C | ⬜ | C-06 |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | C | ✅ | C-06 |
 | C-39 | Identidade da marca aplicada ao cliente web | C | ✅ | C-06 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |

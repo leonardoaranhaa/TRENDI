@@ -2,7 +2,7 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** 2026-08-24
+**Última atualização:** 2026-08-25
 **Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
@@ -23,7 +23,8 @@ O que está sendo trabalhado agora:
 | C-04 | Captação WebRTC do navegador | Claude Code | ✅ |
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
 | C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
-| C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ⬜ próxima |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ✅ **nova** |
+| C-10 | Desafio fixo da categoria Aura | Claude Code | ⬜ próxima |
 | C-39 | Identidade da marca aplicada ao cliente web | Claude Code | ✅ **nova** |
 | L-20 | Enviar o logotipo em vetor (SVG) | Leonardo | ⬜ **nova** |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
@@ -71,13 +72,14 @@ produto existe para quem não está duelando: o estádio junta o quadro montado
 no servidor, o chat e a votação — três coisas que estavam prontas e não se
 falavam. **Assistir não pede conta** (D-23); falar e votar, sim.
 
-O trabalho revelou um buraco e não o escondeu: a API nunca avisa o tempo real
-quando o duelo muda de estado, então a votação abriria em momentos diferentes
-para cada pessoa. Virou a **`C-38`**, e o estádio já está pronto para ela — ele
-escuta o aviso e, enquanto não vem, relê o duelo sozinho.
+O buraco que a `C-06` revelou está fechado: **a `C-38` ligou a API ao tempo
+real**. Quando o duelo muda de estado, o aviso sai de dentro da mesma
+transação que grava a transição (D-26) — então a janela de votação abre no
+mesmo instante para todo mundo, que é o que a legitima. Está provado em
+navegador: a tela vira de EXECUÇÃO para VOTAÇÃO sem recarregar.
 
-O caminho segue em `C-38` e `C-10`. Nada espera você: sem a conta AWS, a tela
-diz na cara que não há vídeo saindo dali.
+O caminho segue em `C-10` (o desafio da categoria Aura). Nada espera você:
+sem a conta AWS, a tela diz na cara que não há vídeo saindo dali.
 
 **A plataforma agora tem a cara da marca (D-25).** Preto de verdade, azul
 `#0132FF` e Montserrat, com o escuro subindo em azul-noite — nada de cinza
@@ -123,6 +125,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-25 | C-38: o aviso de estado atravessa da API ao tempo real pelo Postgres, dentro da transação (D-26) | C-10 — desafio Aura |
 | 2026-08-25 | C-39: identidade da marca aplicada ao cliente web — paleta, tipografia, logotipo e os lados do duelo (258 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-06: estádio — visitante assiste, chat conectado, voto na tela e placar só no fim (255 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-05: quadro do duelo com lado fixo, qualidade escrita e segunda chance para a composição (238 testes) | C-06 — estádio |

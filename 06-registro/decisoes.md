@@ -308,6 +308,23 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **O que a peça de marca traz e o produto não segue:** o quadro de identidade mostra aplicações em Twitch, YouTube, Kick e TikTok Live. Isso é colateral de marketing. A TRENDI é ambiente próprio — não embutimos live de terceiro (é o princípio nº 4 e a razão da D-01). As peças servem à divulgação; a arquitetura não muda por causa delas.
 
+## D-26 — O aviso de estado atravessa pelo Postgres, não por HTTP
+**Data:** 2026-08-25 **Status:** travada
+
+**Decisão:** quando o duelo muda de estado, a API dispara `pg_notify` no canal `duelo_estado`, **dentro da transação que grava a transição**. O servidor de tempo real escuta com uma conexão dedicada e repassa para a sala.
+
+**Por quê, e a razão principal não é a óbvia.** A óbvia é não acrescentar infraestrutura — verdade, mas HTTP também não acrescentaria. A que decide é esta: `pg_notify` numa transação **só é entregue se ela der certo**. Avisar de uma transição que não gravou passa a ser impossível por construção, em vez de depender de alguém manter a ordem certa das chamadas. É este aviso que abre a janela de votação na tela de todo mundo; se ele mentir, o duelo mente.
+
+A segunda razão é escala: com HTTP, a API precisaria conhecer o endereço de cada instância de tempo real. Esquecer uma significaria metade da plateia com a janela atrasada — exatamente o defeito que a `C-38` existe para matar, voltando pela porta dos fundos.
+
+**Vai só o estado final da chamada.** O ACEITE é instantâneo e encadeia transições; um aviso por passagem faria a tela piscar, e quem recebe relê o duelo de qualquer jeito.
+
+**A releitura periódica do estádio fica.** Ela é o piso enquanto a conexão do ouvinte cai e volta. Duas fontes para o mesmo fato não é redundância à toa: é o que a `C-06` já previa.
+
+**Custo aceito:** o tempo real passa a exigir `DATABASE_URL` — antes ele só precisava dela para o histórico do chat, agora sem ela não há aviso nenhum, e o processo recusa subir dizendo isso.
+
+**O que isto não é:** agendador. Timeout automático de estado continua dependendo de alguém clicar até a `C-16`. A `C-38` transporta o aviso; não decide quando o duelo muda.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

@@ -43,13 +43,23 @@ Como o quadro fica montado é regra de produto, não parâmetro de fornecedor. M
 
 **Composição que não subiu tem segunda chance.** Quando a mídia falha na transição para EXECUÇÃO, a transição acontece assim mesmo — auditoria vale mais que palco —, e o duelo fica no ar sem ninguém podendo assistir. Sem agendador nesta fase (é a `C-16`), a segunda tentativa acontece quando um competidor pede credencial. Quem perde a corrida desliga a composição que acabou de subir: duas no ar custam dobrado e entregam dois quadros diferentes para a mesma plateia.
 
-## O aviso de estado, que ainda não existe
+## O aviso de estado, entre a API e o tempo real
 
-O servidor de tempo real sabe avisar a sala que o duelo mudou de estado — `publishState`, escrito na `C-07`. **Ninguém chama.** A API é outro processo, e não alcança aquela função em memória.
+São dois processos — carga de chat não pode derrubar login —, então a API não alcança o `publishState` do tempo real em memória. O recado atravessa pelo **`LISTEN`/`NOTIFY` do Postgres**, que os dois já falam. O contrato do canal mora em `@trendi/shared` (`state-channel.ts`), como o do chat.
 
-Enquanto nada escutava, isso era invisível. Com o estádio aberto (`C-06`) passa a não ser: a votação abriria em momentos diferentes para cada pessoa, e a janela é de 30 a 45 segundos.
+Por que não uma chamada HTTP da API para o tempo real, que seria mais óbvia:
 
-O estádio já escuta as duas fontes — a mensagem `state` do WebSocket e uma releitura periódica do duelo, que é o piso. Ligar a API ao tempo real é a **`C-38`**, e quando chegar o cliente não muda uma linha.
+| | `NOTIFY` | HTTP |
+|---|---|---|
+| Aviso de transição que não gravou | **impossível**: só é entregue no commit | possível, e o erro é silencioso |
+| Várias instâncias de tempo real | fan-out do banco | a API teria de conhecer cada endereço |
+| Infraestrutura nova | nenhuma | nenhuma |
+
+A primeira linha é a que decide. O aviso sai de dentro da mesma transação que grava `duel_transitions`: não é uma ordem de chamadas que alguém pode inverter sem querer, é o banco garantindo.
+
+**Vai só o estado final da chamada.** O ACEITE é instantâneo, então uma transição pode encadear outras; mandar um aviso por passagem faria a tela piscar, e quem recebe relê o duelo de qualquer jeito.
+
+**O piso continua.** O estádio relê o duelo a cada 3s além de escutar o aviso. É o que cobre a janela entre a conexão do ouvinte cair e a reconexão subir — e é por isso que a `C-06` nasceu com duas fontes.
 
 ## Serviço de Votação — ordem de operações
 

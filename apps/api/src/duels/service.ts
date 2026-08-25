@@ -1,6 +1,7 @@
 import type { Duel, PrismaClient, User } from '@trendi/db';
 import type { PublishCredential, VideoProvider } from '@trendi/video';
 import {
+  DUEL_STATE_CHANNEL,
   applyEvent,
   stateDurationMs,
   tallySimpleVote,
@@ -163,6 +164,20 @@ export async function applyDuelEvent(
             }),
       },
     });
+
+    // O aviso ao tempo real sai daqui de dentro, e não depois (C-38).
+    //
+    // `pg_notify` numa transação só é entregue se ela der certo. Isso torna
+    // impossível avisar de uma transição que não aconteceu — garantia que
+    // uma chamada HTTP depois do commit não daria, e que importa porque é
+    // este aviso que abre a janela de votação na tela de todo mundo.
+    //
+    // Vai só o estado final: a cadeia automática (ACEITE é instantâneo)
+    // renderia três avisos seguidos, e a tela só piscaria.
+    await tx.$executeRaw`SELECT pg_notify(${DUEL_STATE_CHANNEL}, ${JSON.stringify({
+      duelId,
+      state: snapshot.state,
+    })})`;
 
     // Toda passagem vira linha, inclusive as automáticas: auditoria com buraco
     // não é auditoria (convenção 3).

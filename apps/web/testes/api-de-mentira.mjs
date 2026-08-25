@@ -67,6 +67,8 @@ const DUELOS = {
   // para a tela provar que **ela** também não mostra placar parcial — sem
   // isso, o teste de navegador passaria mesmo com a regra quebrada.
   'duelo-que-vaza': { ...base, id: 'duelo-que-vaza', state: 'voting' },
+  // Este muda de estado durante o teste, para provar a C-38 no navegador.
+  'duelo-que-vira': { ...base, id: 'duelo-que-vira', state: 'running' },
   'duelo-decidido': {
     ...base,
     id: 'duelo-decidido',
@@ -131,6 +133,22 @@ const servidor = createServer(async (requisicao, resposta) => {
             : null,
       },
     });
+  }
+
+  // Só para o teste: vira o estado do duelo e avisa a sala, do mesmo jeito
+  // que a API de verdade avisa (pelo Postgres, na C-38). É o que permite
+  // provar no navegador que a tela muda sem recarregar.
+  const virar = url.pathname.match(/^\/testes\/duels\/([^/]+)\/estado\/([a-z_]+)$/);
+  if (virar !== null) {
+    const duel = DUELOS[virar[1]];
+    if (duel === undefined) return responder(404, { error: 'duelo_nao_encontrado' });
+    duel.state = virar[2];
+    for (const socket of salas.clients) envie(socket, {
+      type: 'state',
+      duelId: duel.id,
+      state: duel.state,
+    });
+    return responder(200, { ok: true, state: duel.state });
   }
 
   responder(404, { error: 'nao_encontrado' });

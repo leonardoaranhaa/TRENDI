@@ -113,3 +113,21 @@ test('avisa quando o duelo não existe', async ({ page }) => {
 
   await expect(page.getByText(/Esse duelo não existe/)).toBeVisible();
 });
+
+test('a tela vira de execução para votação sem recarregar (C-38)', async ({ page, context, request }) => {
+  // O que a C-38 produz: o aviso da sala chega e a tela muda sozinha. Antes
+  // dela, isso só acontecia quando a releitura periódica calhasse — e a
+  // janela de votação dura 30 a 45 segundos, então "quando calhar" é
+  // vantagem para uns e desvantagem para outros.
+  await context.addCookies([COOKIE]);
+  await request.post('http://127.0.0.1:3199/testes/duels/duelo-que-vira/estado/running');
+
+  await page.goto('/duelo/duelo-que-vira');
+  await expect(page.getByTestId('estado')).toContainText('running');
+  await expect(page.getByTestId('votar-a')).toHaveCount(0);
+
+  await request.post('http://127.0.0.1:3199/testes/duels/duelo-que-vira/estado/voting');
+
+  await expect(page.getByTestId('estado')).toContainText('voting');
+  await expect(page.getByTestId('votar-a')).toBeVisible();
+});
