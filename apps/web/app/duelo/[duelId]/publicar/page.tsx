@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Publicar({ params }: { params: Promise<{ duelId: string }> }) {
   const { duelId } = await params;
-  const [user, duel] = await Promise.all([getSessionUser(), getDuel(duelId)]);
+  const [user, dados] = await Promise.all([getSessionUser(), getDuel(duelId)]);
 
   if (user === null) redirect(`/entrar?voltar=${encodeURIComponent(`/duelo/${duelId}/publicar`)}`);
 
@@ -27,7 +27,8 @@ export default async function Publicar({ params }: { params: Promise<{ duelId: s
     </main>
   );
 
-  if (duel === null) return moldura(<Aviso>Esse duelo não existe, ou já saiu do ar.</Aviso>);
+  if (dados === null) return moldura(<Aviso>Esse duelo não existe, ou já saiu do ar.</Aviso>);
+  const { duel } = dados;
 
   // Só os dois competidores publicam. A plateia assiste no estádio (C-06).
   const side = ladoDoCompetidor(duel, user.id);

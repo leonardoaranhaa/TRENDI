@@ -271,6 +271,28 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **O que ainda não está provado:** que o IVS de fato coloca `'a'` à esquerda. O teste prova que mandamos `participantOrderAttribute: 'side'`; a ordem só a AWS responde, e a conta existe depois de `L-19` — onde isso virou item de checklist.
 
+## D-23 — Assistir não pede conta; falar e votar pedem
+**Data:** 2026-08-24 **Status:** travada
+
+**Decisão:** o estádio abre para qualquer pessoa. Visitante vê o duelo, o estado, quem está duelando e o resultado. Conta só entra em cena para escrever no chat e para votar.
+
+**Por quê:** decisão do Leonardo. A plataforma cresce por link e por clipe — é o que a `C-21` existe para produzir —, e link que morre numa tela de cadastro não cresce nada. A fricção fica onde há contrapartida: para votar, a conta é o que sustenta "uma conta, um voto" e o antifraude das regras §6.
+
+**O custo, escrito para não ser esquecido:** pico de espectador anônimo consome entrega, que é ~97% da conta (D-20) e vira conta sem virar conta de usuário. Se isso apertar, o lugar de mexer é teto de espectador simultâneo por duelo — que a `visao-geral.md` já lista como mitigação —, não a porta do estádio.
+
+**Consequência no código:** `GET /duels/:duelId` responde sem sessão, e o estádio nunca redireciona para o login. A parede só aparece onde existe ação atrás dela: é o que `situacaoDaPlateia` decide, e o que os testes de navegador provam abrindo a página sem cookie nenhum.
+
+## D-24 — Player do IVS para a plateia
+**Data:** 2026-08-24 **Status:** travada, com o mesmo gatilho da D-20
+
+**Decisão:** quem assiste usa o `amazon-ivs-player`, do fornecedor já escolhido na D-20, isolado em `apps/web/lib/ivs-player.ts` com `import()` dinâmico. Os binários de worker e wasm são servidos por nós, copiados no build — não pelo CDN do fornecedor.
+
+**Por quê:** o player do IVS entende LL-HLS de verdade, e latência é o que legitima o voto — plateia atrasada julga outro instante (princípio 5). A alternativa neutra, `hls.js`, tocaria HLS de qualquer origem, mas com suporte genérico a baixa latência: o ganho de portabilidade sai do lugar errado.
+
+**O que compensa o acoplamento:** o SDK entra por um arquivo só, como o de captação da C-04. Quando o gatilho de revisão da D-20 disparar, trocar de player é trocar esse arquivo.
+
+**Servir os binários daqui** evita que cada espectador dependa de um terceiro para o vídeo abrir. São ~1,6 MB: entram no build (`apps/web/scripts/copiar-player.mjs`), não no repositório.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

@@ -20,7 +20,7 @@
     "dev:realtime": "npm run dev -w @trendi/realtime",
     "dev:web": "npm run dev -w @trendi/web",
     "clean": "tsc --build --clean",
-    "test:navegador": "API_PUBLIC_URL=http://127.0.0.1:3199 npm run build -w @trendi/web && playwright test"
+    "test:navegador": "API_PUBLIC_URL=http://127.0.0.1:3199 NEXT_PUBLIC_REALTIME_URL=ws://127.0.0.1:3198 npm run build -w @trendi/web && playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

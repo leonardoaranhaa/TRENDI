@@ -1,4 +1,4 @@
-import type { Duel, PrismaClient } from '@trendi/db';
+import type { Duel, PrismaClient, User } from '@trendi/db';
 import type { PublishCredential, VideoProvider } from '@trendi/video';
 import {
   applyEvent,
@@ -66,6 +66,28 @@ export function duelView(duel: Duel): DuelView {
     scoreB: duel.scoreB === null ? null : Number(duel.scoreB),
     countsForRanking: duel.countsForRanking,
     playbackUrl: duel.playbackUrl,
+  };
+}
+
+/**
+ * Um competidor como a plateia o vê (C-06).
+ *
+ * De propósito menor que o `publicUser` do login: e-mail e situação de senha
+ * são da conta de quem está logado, não do estádio inteiro.
+ */
+export interface CompetitorView {
+  readonly id: string;
+  readonly handle: string;
+  readonly displayName: string | null;
+  readonly avatarUrl: string | null;
+}
+
+export function competitorView(user: User): CompetitorView {
+  return {
+    id: user.id,
+    handle: user.handle,
+    displayName: user.displayName,
+    avatarUrl: user.avatarUrl,
   };
 }
 

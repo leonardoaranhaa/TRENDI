@@ -79,8 +79,37 @@ export interface PublishCredential {
   expiresAt: string;
 }
 
-/** O duelo como o servidor o vê agora. `null` quando não existe. */
-export async function getDuel(duelId: string): Promise<DuelView | null> {
+/** Um competidor como a plateia o vê. Sem e-mail: isso é da conta dele. */
+export interface Competidor {
+  id: string;
+  handle: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
+export interface SituacaoDaVotacao {
+  state: string;
+  /** Quantas contas já votaram. Não diz em quem — isso é de propósito. */
+  voters: number;
+  yourVote: 'a' | 'b' | null;
+  /** Só existe depois do RESULTADO. Durante a votação vem nulo. */
+  tally: { winner: string; shareA: number; shareB: number } | null;
+}
+
+/** O duelo inteiro, como o estádio precisa dele. */
+export interface DueloNoAr {
+  duel: DuelView;
+  competitors: { a: Competidor; b: Competidor };
+  voting: SituacaoDaVotacao;
+}
+
+/**
+ * O duelo como o servidor o vê agora. `null` quando não existe.
+ *
+ * Funciona sem sessão: assistir não pede conta (ver `estadio.ts`). O cookie
+ * vai junto quando existe, e é ele que faz o `yourVote` voltar preenchido.
+ */
+export async function getDuel(duelId: string): Promise<DueloNoAr | null> {
   const cookieHeader = (await cookies()).toString();
 
   try {
@@ -89,7 +118,7 @@ export async function getDuel(duelId: string): Promise<DuelView | null> {
       cache: 'no-store',
     });
     if (!response.ok) return null;
-    return ((await response.json()) as { duel: DuelView }).duel;
+    return (await response.json()) as DueloNoAr;
   } catch {
     return null;
   }

@@ -32,12 +32,13 @@
 | C-03 | Integrar SDK do fornecedor de vídeo | C | ✅ | — |
 | C-04 | Captação WebRTC do navegador (sem download) | C | ✅ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ✅ | C-04 |
-| C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
+| C-06 | Sala de duelo: página do estádio, versão mínima | C | ✅ | C-05 |
 | C-07 | Chat único por WebSocket | C | ✅ | C-01 |
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ✅ | C-08 |
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | — |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | C | ⬜ | C-06 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
 | L-19 | Criar conta AWS e habilitar IVS | L | ⬜ | — |

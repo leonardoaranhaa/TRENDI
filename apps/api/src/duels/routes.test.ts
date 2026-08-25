@@ -247,3 +247,55 @@ describe('o que aparece durante e depois', () => {
     expect(response.statusCode).toBe(404);
   });
 });
+
+describe('o duelo visto do estádio', () => {
+  it('sai com nome dos dois competidores, não com UUID', async () => {
+    const { duel, a, b } = await duelo('running');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+    const { competitors } = resposta.json();
+
+    expect(competitors.a.id).toBe(a.id);
+    expect(competitors.b.id).toBe(b.id);
+    expect(competitors.a.handle).toMatch(/^criador_a_/);
+    expect(competitors.b.handle).toMatch(/^criador_b_/);
+  });
+
+  it('não vaza e-mail de quem está duelando', async () => {
+    // `publicUser` serve para quem está logado ver a própria conta. O estádio
+    // é outra coisa: e-mail e situação de senha não são da plateia.
+    const { duel, a } = await duelo('running');
+    await prisma.user.update({ where: { id: a.id }, data: { email: 'a@trendi.test' } });
+
+    const { competitors } = (await chamada('GET', `/duels/${duel.id}`)).json();
+
+    expect(competitors.a).toEqual({
+      id: a.id,
+      handle: expect.stringMatching(/^criador_a_/),
+      displayName: null,
+      avatarUrl: null,
+    });
+  });
+
+  it('responde para visitante — assistir não pede conta', async () => {
+    const { duel } = await duelo('running');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+
+    expect(resposta.statusCode).toBe(200);
+    expect(resposta.json().duel.state).toBe('running');
+    // Visitante não tem voto para lembrar, e não é erro: é visitante.
+    expect(resposta.json().voting.yourVote).toBeNull();
+  });
+
+  it('não devolve apuração enquanto a votação está aberta', async () => {
+    // A regra é do produto: placar que anda ao vivo empurra quem ainda não
+    // votou para o lado que está ganhando.
+    const { duel } = await duelo('voting');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+
+    expect(resposta.json().voting.tally).toBeNull();
+  });
+});
+

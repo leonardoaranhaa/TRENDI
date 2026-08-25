@@ -43,6 +43,14 @@ Como o quadro fica montado é regra de produto, não parâmetro de fornecedor. M
 
 **Composição que não subiu tem segunda chance.** Quando a mídia falha na transição para EXECUÇÃO, a transição acontece assim mesmo — auditoria vale mais que palco —, e o duelo fica no ar sem ninguém podendo assistir. Sem agendador nesta fase (é a `C-16`), a segunda tentativa acontece quando um competidor pede credencial. Quem perde a corrida desliga a composição que acabou de subir: duas no ar custam dobrado e entregam dois quadros diferentes para a mesma plateia.
 
+## O aviso de estado, que ainda não existe
+
+O servidor de tempo real sabe avisar a sala que o duelo mudou de estado — `publishState`, escrito na `C-07`. **Ninguém chama.** A API é outro processo, e não alcança aquela função em memória.
+
+Enquanto nada escutava, isso era invisível. Com o estádio aberto (`C-06`) passa a não ser: a votação abriria em momentos diferentes para cada pessoa, e a janela é de 30 a 45 segundos.
+
+O estádio já escuta as duas fontes — a mensagem `state` do WebSocket e uma releitura periódica do duelo, que é o piso. Ligar a API ao tempo real é a **`C-38`**, e quando chegar o cliente não muda uma linha.
+
 ## Serviço de Votação — ordem de operações
 
 ```

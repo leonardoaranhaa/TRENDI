@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createPrismaClient, type PrismaClient } from '@trendi/db';
 import { startTestDatabase, type TestDatabase } from '@trendi/db/testing';
 import { issueRealtimeTicket } from '@trendi/shared/realtime-ticket';
-import { HISTORY_SIZE, MAX_MESSAGE_LENGTH, type ServerMessage } from './protocol.js';
+import { HISTORY_SIZE, MAX_MESSAGE_LENGTH, type ServerMessage } from '@trendi/shared';
 import { createRealtimeServer, type RealtimeServer } from './server.js';
 
 const SECRET = 'segredo-de-teste';

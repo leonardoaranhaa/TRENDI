@@ -22,7 +22,8 @@ O que está sendo trabalhado agora:
 | C-03 | Integrar o SDK de vídeo | Claude Code | ✅ |
 | C-04 | Captação WebRTC do navegador | Claude Code | ✅ |
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
-| C-06 | Sala de duelo: página do estádio | Claude Code | ⬜ próxima |
+| C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ⬜ próxima |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -63,12 +64,18 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-**A fila de código segue andando.** `C-05` fechou: o quadro do duelo agora
-tem lado fixo — A à esquerda, B à direita, em todo duelo (D-22). Sem isso a
-ordem seria a de chegada, e o placar em DOM sobre o vídeo passaria a apontar
-para o competidor errado. O caminho segue em `C-06` (estádio), com `C-10` em
-paralelo. Nada espera você: sem a conta AWS, a tela roda em modo local e diz
-isso na cara.
+**A fila de código segue andando.** `C-06` fechou, e é a primeira vez que o
+produto existe para quem não está duelando: o estádio junta o quadro montado
+no servidor, o chat e a votação — três coisas que estavam prontas e não se
+falavam. **Assistir não pede conta** (D-23); falar e votar, sim.
+
+O trabalho revelou um buraco e não o escondeu: a API nunca avisa o tempo real
+quando o duelo muda de estado, então a votação abriria em momentos diferentes
+para cada pessoa. Virou a **`C-38`**, e o estádio já está pronto para ela — ele
+escuta o aviso e, enquanto não vem, relê o duelo sozinho.
+
+O caminho segue em `C-38` e `C-10`. Nada espera você: sem a conta AWS, a tela
+diz na cara que não há vídeo saindo dali.
 
 **Entrou item no seu `L-19`:** criar a *encoder configuration* de 720p (é ela
 que fixa a qualidade e o custo da entrega) e conferir, com a conta na mão, que
@@ -99,6 +106,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-24 | C-06: estádio — visitante assiste, chat conectado, voto na tela e placar só no fim (255 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-05: quadro do duelo com lado fixo, qualidade escrita e segunda chance para a composição (238 testes) | C-06 — estádio |
 | 2026-08-21 | C-04: tela do competidor, captação sem download, modo local e 5 testes de navegador (233 + 5) | C-05 — composição |
 | 2026-08-20 | C-03: camada de mídia atrás de interface, com fornecedor falso e adaptador IVS (220 testes) | C-04 — captação no navegador |

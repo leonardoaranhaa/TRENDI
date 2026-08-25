@@ -2,14 +2,15 @@ import { randomUUID } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
 import { WebSocketServer, type WebSocket } from 'ws';
 import type { PrismaClient } from '@trendi/db';
-import type { DuelState, Stand } from '@trendi/shared';
-import { verifyRealtimeTicket } from '@trendi/shared/realtime-ticket';
 import {
   HISTORY_SIZE,
   MAX_MESSAGE_LENGTH,
   parseClientMessage,
   type ChatMessage,
-} from './protocol.js';
+  type DuelState,
+  type Stand,
+} from '@trendi/shared';
+import { verifyRealtimeTicket } from '@trendi/shared/realtime-ticket';
 import { CHAT_RATE_LIMIT, RateLimiter, type RateLimitOptions } from './rate-limit.js';
 import { Rooms, send } from './rooms.js';
 
