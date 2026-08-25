@@ -7,7 +7,7 @@ import type { DueloNoAr } from '../../../lib/api';
 import { abrirChat, type Chat } from '../../../lib/chat-cliente';
 import { mensagemDoVoto, situacaoDaPlateia } from '../../../lib/estadio';
 import { tocar, type PlayerDoDuelo } from '../../../lib/ivs-player';
-import { Aviso, Botao, Erro } from '../../componentes/campos';
+import { Aviso, Botao, BotaoDoLado, Erro } from '../../componentes/campos';
 
 /**
  * A arquibancada (C-06).
@@ -144,10 +144,10 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
     <>
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">
-          {nomeDe(competitors.a)} <span className="text-neutral-500">x</span>{' '}
+          {nomeDe(competitors.a)} <span className="text-tinta-fraca">x</span>{' '}
           {nomeDe(competitors.b)}
         </h1>
-        <p className="text-neutral-400" data-testid="chamada">
+        <p className="text-tinta-fraca" data-testid="chamada">
           {situacao.chamada}
         </p>
         <span className="hidden" data-testid="estado">
@@ -159,15 +159,15 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
           no quadro composto (D-22): é o que faz "o da esquerda" significar
           alguém, e é do que placar e barulhômetro vão depender. */}
       <section className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-neutral-800 text-sm">
-          <Lado nome={nomeDe(competitors.a)} lado="A" />
-          <Lado nome={nomeDe(competitors.b)} lado="B" />
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <Lado nome={nomeDe(competitors.a)} lado="a" />
+          <Lado nome={nomeDe(competitors.b)} lado="b" />
         </div>
 
-        <div className="aspect-video overflow-hidden rounded-xl border border-neutral-800 bg-black">
+        <div className="aspect-video overflow-hidden rounded-xl border border-traco-aceso bg-preto">
           {duel.playbackUrl === null ? (
             <div
-              className="flex h-full items-center justify-center px-6 text-center text-sm text-neutral-500"
+              className="flex h-full items-center justify-center px-6 text-center text-sm text-tinta-fraca"
               data-testid="sem-video"
             >
               Ainda não há vídeo saindo daqui. O duelo funciona, o chat funciona, o voto funciona —
@@ -182,16 +182,18 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
       <section className="flex flex-col gap-4">
         {situacao.podeVotar && (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-tinta-fraca">
               Quem levou melhor? O voto é secreto até a janela fechar.
             </p>
+            {/* O botão veste a cor do lado: quem vota reconhece em quem vota
+                sem ler, e é a mesma cor que o chip lá em cima. */}
             <div className="flex gap-3">
-              <Botao onClick={() => void votar('a')} data-testid="votar-a">
+              <BotaoDoLado lado="a" onClick={() => void votar('a')} data-testid="votar-a">
                 {nomeDe(competitors.a)}
-              </Botao>
-              <Botao onClick={() => void votar('b')} data-testid="votar-b">
+              </BotaoDoLado>
+              <BotaoDoLado lado="b" onClick={() => void votar('b')} data-testid="votar-b">
                 {nomeDe(competitors.b)}
-              </Botao>
+              </BotaoDoLado>
             </div>
             <Erro>{erroDoVoto === null ? null : mensagemDoVoto(erroDoVoto)}</Erro>
           </div>
@@ -211,18 +213,18 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
         )}
 
         {/* Quantas contas votaram é atmosfera, não placar: não diz em quem. */}
-        <p className="text-sm text-neutral-500" data-testid="votantes">
+        <p className="text-sm text-tinta-fraca" data-testid="votantes">
           {voting.voters === 1 ? '1 voto registrado' : `${voting.voters} votos registrados`}
         </p>
 
         {situacao.mostraPlacar && voting.tally !== null && (
-          <div className="rounded-xl border border-neutral-800 px-4 py-3" data-testid="placar">
+          <div className="rounded-xl border border-traco px-4 py-3" data-testid="placar">
             <p className="font-medium">
               {voting.tally.winner === 'undecided'
                 ? 'Empate.'
                 : `Vitória de ${nomeDe(voting.tally.winner === 'a' ? competitors.a : competitors.b)}.`}
             </p>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-tinta-fraca">
               {porcentagem(voting.tally.shareA)} x {porcentagem(voting.tally.shareB)}
             </p>
           </div>
@@ -230,12 +232,12 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
       </section>
 
       <section className="flex flex-col gap-3" data-testid="chat">
-        <h2 className="text-sm font-medium text-neutral-400">Chat</h2>
+        <h2 className="text-sm font-medium text-tinta-fraca">Chat</h2>
 
-        <ul className="flex h-64 flex-col gap-2 overflow-y-auto rounded-xl border border-neutral-800 px-4 py-3 text-sm">
+        <ul className="flex h-64 flex-col gap-2 overflow-y-auto rounded-xl border border-traco px-4 py-3 text-sm">
           {mensagens.map((mensagem) => (
             <li key={mensagem.id}>
-              <span className="text-neutral-500">{mensagem.handle}</span> {mensagem.body}
+              <span className="text-tinta-fraca">{mensagem.handle}</span> {mensagem.body}
             </li>
           ))}
         </ul>
@@ -253,7 +255,7 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
               onChange={(evento) => setRascunho(evento.target.value)}
               placeholder="Falar com a arquibancada"
               data-testid="rascunho"
-              className="flex-1 rounded-lg border border-neutral-800 bg-transparent px-3 py-2 outline-none focus:border-neutral-600"
+              className="flex-1 rounded-lg border border-traco-aceso bg-noite px-3 py-2 outline-none transition focus:border-azul focus:shadow-brilho"
             />
             <Botao type="submit">Enviar</Botao>
           </form>
@@ -271,18 +273,30 @@ export function EstadioCliente({ duelId, inicial, eu }: Props) {
         )}
       </section>
 
-      <Link href="/" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/" className="text-sm text-tinta-fraca underline underline-offset-4">
         Voltar
       </Link>
     </>
   );
 }
 
-function Lado({ nome, lado }: { nome: string; lado: 'A' | 'B' }) {
+/**
+ * Quem está de cada lado.
+ *
+ * A à esquerda e B à direita, sempre — a mesma regra do quadro composto
+ * (D-22). Azul e branco, sólidos os dois: os lados de um duelo não podem
+ * parecer ter pesos diferentes.
+ */
+function Lado({ nome, lado }: { nome: string; lado: 'a' | 'b' }) {
+  const veste =
+    lado === 'a'
+      ? 'bg-azul text-branco shadow-brilho'
+      : 'bg-branco text-preto shadow-brilho-branco';
+  const suave = lado === 'a' ? 'text-branco/70' : 'text-preto/60';
   return (
-    <div className="bg-neutral-950 px-4 py-3">
-      <span className="text-neutral-500">Lado {lado}</span>
-      <p className="font-medium">{nome}</p>
+    <div className={`rounded-xl px-4 py-3 ${veste}`}>
+      <span className={`voz-da-marca text-[0.6rem] ${suave}`}>Lado {lado.toUpperCase()}</span>
+      <p className="text-base font-semibold">{nome}</p>
     </div>
   );
 }

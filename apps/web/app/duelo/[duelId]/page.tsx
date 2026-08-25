@@ -25,7 +25,7 @@ export default async function Estadio({ params }: { params: Promise<{ duelId: st
       <>
         <h1 className="text-3xl font-bold tracking-tight">Duelo</h1>
         <Aviso>Esse duelo não existe, ou já saiu do ar.</Aviso>
-        <Link href="/" className="text-sm text-neutral-500 underline underline-offset-4">
+        <Link href="/" className="text-sm text-tinta-fraca underline underline-offset-4">
           Voltar
         </Link>
       </>,

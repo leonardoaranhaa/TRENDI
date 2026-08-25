@@ -51,9 +51,9 @@ export function PerfilForm({ user }: { user: SessionUser }) {
   return (
     <form onSubmit={salvar} className="flex flex-col gap-6">
       <label className="flex flex-col gap-2">
-        <span className="text-sm text-neutral-400">Seu nome na arquibancada</span>
-        <div className="flex items-center gap-2 rounded-lg border border-neutral-800 px-3 py-2">
-          <span className="text-neutral-600">@</span>
+        <span className="text-sm text-tinta-fraca">Seu nome na arquibancada</span>
+        <div className="flex items-center gap-2 rounded-lg border border-traco px-3 py-2">
+          <span className="text-tinta-fraca">@</span>
           <input
             value={handle}
             onChange={(event) => setHandle(event.target.value.toLowerCase())}
@@ -65,11 +65,11 @@ export function PerfilForm({ user }: { user: SessionUser }) {
       </label>
 
       <label className="flex flex-col gap-2">
-        <span className="text-sm text-neutral-400">Nome que aparece na tela</span>
+        <span className="text-sm text-tinta-fraca">Nome que aparece na tela</span>
         <input
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
-          className="rounded-lg border border-neutral-800 bg-transparent px-3 py-2 outline-none"
+          className="rounded-lg border border-traco bg-transparent px-3 py-2 outline-none"
           maxLength={60}
         />
       </label>
@@ -81,7 +81,7 @@ export function PerfilForm({ user }: { user: SessionUser }) {
         <button
           type="submit"
           disabled={status === 'salvando'}
-          className="rounded-lg bg-neutral-100 px-4 py-2 font-medium text-neutral-950 transition hover:bg-white disabled:opacity-50"
+          className="rounded-lg bg-azul px-4 py-2 font-medium text-branco transition hover:bg-white disabled:opacity-50"
         >
           {status === 'salvando' ? 'Salvando…' : 'Salvar'}
         </button>
@@ -89,7 +89,7 @@ export function PerfilForm({ user }: { user: SessionUser }) {
         <button
           type="button"
           onClick={sair}
-          className="text-sm text-neutral-500 underline underline-offset-4 hover:text-neutral-300"
+          className="text-sm text-tinta-fraca underline underline-offset-4 hover:text-branco"
         >
           Sair
         </button>

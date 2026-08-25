@@ -39,9 +39,11 @@
 | C-10 | Desafio fixo da categoria Aura | C | ⬜ | — |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
 | C-38 | A API avisa o tempo real quando o duelo muda de estado | C | ⬜ | C-06 |
+| C-39 | Identidade da marca aplicada ao cliente web | C | ✅ | C-06 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
 | L-19 | Criar conta AWS e habilitar IVS | L | ⬜ | — |
+| L-20 | Enviar o logotipo da TRENDI em vetor (SVG) | L | ⬜ | — |
 | C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
 
 > **A fila voltou a andar.** `L-03` e `L-06` foram resolvidas em 2026-08-20 —

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { corpoDoErro, mensagemDoErro } from '../../lib/mensagens';
 import { Aviso, Botao, Campo, Erro } from '../componentes/campos';
+import { MarcaLink } from '../componentes/marca';
 
 export default function RecuperarSenha() {
   const [email, setEmail] = useState('');
@@ -42,9 +43,11 @@ export default function RecuperarSenha() {
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-8 px-6 py-24">
+      <MarcaLink />
+
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Esqueci a senha</h1>
-        <p className="text-neutral-400">A gente manda um link para você escolher outra.</p>
+        <p className="text-tinta-fraca">A gente manda um link para você escolher outra.</p>
       </header>
 
       {enviado ? (
@@ -78,7 +81,7 @@ export default function RecuperarSenha() {
         </form>
       )}
 
-      <Link href="/entrar" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/entrar" className="text-sm text-tinta-fraca underline underline-offset-4">
         Voltar para entrar
       </Link>
     </main>

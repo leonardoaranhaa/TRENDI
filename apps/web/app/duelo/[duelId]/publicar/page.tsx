@@ -16,12 +16,12 @@ export default async function Publicar({ params }: { params: Promise<{ duelId: s
     <main className="mx-auto flex max-w-2xl flex-col gap-8 px-6 py-16">
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Sua câmera</h1>
-        <p className="text-neutral-400">
+        <p className="text-tinta-fraca">
           A captação é direto do navegador. Nada para instalar — nunca vai ter.
         </p>
       </header>
       {conteudo}
-      <Link href="/" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/" className="text-sm text-tinta-fraca underline underline-offset-4">
         Voltar
       </Link>
     </main>

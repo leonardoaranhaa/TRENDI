@@ -24,6 +24,8 @@ O que está sendo trabalhado agora:
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
 | C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
 | C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ⬜ próxima |
+| C-39 | Identidade da marca aplicada ao cliente web | Claude Code | ✅ **nova** |
+| L-20 | Enviar o logotipo em vetor (SVG) | Leonardo | ⬜ **nova** |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -77,6 +79,21 @@ escuta o aviso e, enquanto não vem, relê o duelo sozinho.
 O caminho segue em `C-38` e `C-10`. Nada espera você: sem a conta AWS, a tela
 diz na cara que não há vídeo saindo dali.
 
+**A plataforma agora tem a cara da marca (D-25).** Preto de verdade, azul
+`#0132FF` e Montserrat, com o escuro subindo em azul-noite — nada de cinza
+genérico. Os lados do duelo ficaram azul contra branco, dentro da paleta,
+como você escolheu; para os dois não parecerem ter pesos diferentes, os dois
+são preenchimento sólido e os dois acendem.
+
+Uma coisa apareceu ao medir: **o azul da marca não serve para texto** sobre
+preto (2,9:1 de contraste, abaixo do legível). Ele preenche — botão, chip,
+brilho. Onde o texto precisa ser azul, entra o mesmo azul clareado. Tem teste
+para não se perder.
+
+**`L-20`, sua e rápida:** mandar o logotipo em **vetor (SVG)**. O que está no
+ar foi extraído do quadro de identidade em 615px — serve para tela, não para
+impressão nem para ampliar.
+
 **Entrou item no seu `L-19`:** criar a *encoder configuration* de 720p (é ela
 que fixa a qualidade e o custo da entrega) e conferir, com a conta na mão, que
 o lado A aparece mesmo à esquerda. O código manda o parâmetro certo; só a AWS
@@ -106,6 +123,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-25 | C-39: identidade da marca aplicada ao cliente web — paleta, tipografia, logotipo e os lados do duelo (258 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-06: estádio — visitante assiste, chat conectado, voto na tela e placar só no fim (255 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-05: quadro do duelo com lado fixo, qualidade escrita e segunda chance para a composição (238 testes) | C-06 — estádio |
 | 2026-08-21 | C-04: tela do competidor, captação sem download, modo local e 5 testes de navegador (233 + 5) | C-05 — composição |

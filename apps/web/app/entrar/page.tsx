@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { PROVIDER_LABELS, getProviders, getSessionUser } from '../../lib/api';
 import { EntrarForm } from './entrar-form';
+import { MarcaLink } from '../componentes/marca';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +20,11 @@ export default async function Entrar({
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-8 px-6 py-24">
+      <MarcaLink />
+
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Entrar na TRENDI</h1>
-        <p className="text-neutral-400">
+        <p className="text-tinta-fraca">
           Com conta da TRENDI, ou pelo atalho de quem já tem Google ou Discord.
         </p>
       </header>
@@ -36,10 +39,10 @@ export default async function Entrar({
 
       {providers.length > 0 && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-neutral-600">
-            <span className="h-px flex-1 bg-neutral-800" />
+          <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-tinta-fraca">
+            <span className="h-px flex-1 bg-traco" />
             ou
-            <span className="h-px flex-1 bg-neutral-800" />
+            <span className="h-px flex-1 bg-traco" />
           </div>
 
           <ul className="flex flex-col gap-3">
@@ -47,7 +50,7 @@ export default async function Entrar({
               <li key={provider}>
                 <a
                   href={`/api/auth/${provider}/start`}
-                  className="block rounded-lg border border-neutral-700 px-4 py-3 text-center font-medium transition hover:border-neutral-500 hover:bg-neutral-900"
+                  className="block rounded-lg border border-traco-aceso px-4 py-3 text-center font-medium transition hover:border-azul hover:bg-noite"
                 >
                   {PROVIDER_LABELS[provider] ?? `Entrar com ${provider}`}
                 </a>
@@ -57,7 +60,7 @@ export default async function Entrar({
         </div>
       )}
 
-      <Link href="/" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/" className="text-sm text-tinta-fraca underline underline-offset-4">
         Voltar
       </Link>
     </main>

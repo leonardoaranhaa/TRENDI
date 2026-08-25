@@ -70,7 +70,7 @@ export default function VerificarEmail() {
         <Verificacao />
       </Suspense>
 
-      <Link href="/perfil" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/perfil" className="text-sm text-tinta-fraca underline underline-offset-4">
         Ir para o perfil
       </Link>
     </main>

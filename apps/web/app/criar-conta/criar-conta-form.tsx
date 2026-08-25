@@ -74,9 +74,9 @@ export function CriarContaForm() {
         {enviando ? 'Criando…' : 'Criar conta'}
       </Botao>
 
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-tinta-fraca">
         Já tem conta?{' '}
-        <Link href="/entrar" className="underline underline-offset-4 hover:text-neutral-300">
+        <Link href="/entrar" className="underline underline-offset-4 hover:text-branco">
           Entrar
         </Link>
       </p>

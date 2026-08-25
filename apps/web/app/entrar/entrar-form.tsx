@@ -65,13 +65,13 @@ export function EntrarForm() {
         {enviando ? 'Entrando…' : 'Entrar'}
       </Botao>
 
-      <div className="flex justify-between text-sm text-neutral-500">
-        <Link href="/criar-conta" className="underline underline-offset-4 hover:text-neutral-300">
+      <div className="flex justify-between text-sm text-tinta-fraca">
+        <Link href="/criar-conta" className="underline underline-offset-4 hover:text-branco">
           Criar conta
         </Link>
         <Link
           href="/recuperar-senha"
-          className="underline underline-offset-4 hover:text-neutral-300"
+          className="underline underline-offset-4 hover:text-branco"
         >
           Esqueci a senha
         </Link>

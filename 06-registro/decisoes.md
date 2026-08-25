@@ -293,6 +293,21 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **Servir os binários daqui** evita que cada espectador dependa de um terceiro para o vídeo abrir. São ~1,6 MB: entram no build (`apps/web/scripts/copiar-player.mjs`), não no repositório.
 
+## D-25 — A identidade da marca aplicada ao produto
+**Data:** 2026-08-25 **Status:** travada
+
+**Decisão:** o cliente web veste a identidade da TRENDI — azul `#0132FF`, branco e preto, sobre preto de verdade, com o escuro subindo em azul-noite (`#00061A`) e nunca em cinza-neutro. Tipografia Montserrat, servida por nós. O brilho azul é assinatura, não enfeite: aparece atrás do logotipo em toda peça de marca, e aparece na tela.
+
+**A descoberta que mudou uma coisa:** `#0132FF` sobre preto dá **2,9:1** de contraste — abaixo do mínimo legível para texto. Ele é cor de **preenchimento**: botão, chip, borda acesa, brilho. Onde o texto precisa ser azul, entra o mesmo azul clareado até passar em AA (`#5B82FF`, 6,1:1). Não é desvio da identidade; é o que faz a identidade ser lida em celular no ônibus. Tem teste (`identidade.test.ts`), porque `text-azul` é o que qualquer um escreveria primeiro.
+
+**Os lados do duelo: azul contra branco.** Decisão do Leonardo, mantendo a paleta de três cores intacta em vez de acrescentar um contra-acento quente. O risco que isso corre é assimetria — um lado vestindo a marca e o outro a ausência dela, num produto cuja tese é simetria. A compensação é de peso, e é regra: os dois lados são **preenchimento sólido**, mesmo tamanho, mesma tipografia, e **os dois acendem** (o lado B com brilho branco). Nenhum dos dois é contorno. Se algum dia um lado ganhar tratamento que o outro não tem, isso vira mentira sobre o placar.
+
+**O logotipo é lettering desenhado à mão** — não é fonte, e não se compõe com CSS. Entra como imagem, num componente só (`componentes/marca.tsx`), para a troca pelo vetor ser um arquivo. O arquivo atual foi **extraído do quadro de identidade** em 615px: serve para tela, não para impressão nem ampliação. O SVG é a `L-20`.
+
+**A fonte vem do npm e é servida daqui**, não de `fonts.googleapis.com` — mesmo motivo dos binários do player (D-24): ninguém deveria depender de um terceiro para a página abrir com a cara certa, e build que busca na rede é build que quebra sozinho.
+
+**O que a peça de marca traz e o produto não segue:** o quadro de identidade mostra aplicações em Twitch, YouTube, Kick e TikTok Live. Isso é colateral de marketing. A TRENDI é ambiente próprio — não embutimos live de terceiro (é o princípio nº 4 e a razão da D-01). As peças servem à divulgação; a arquitetura não muda por causa delas.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```
