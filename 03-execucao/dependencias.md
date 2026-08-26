@@ -60,7 +60,7 @@ L-17 (apps OAuth registrados)
 
 ```
 L-06 (regras da plataforma) ✅ três regras de conduta, decisão D-21
-  ├─→ C-10 (desafio da fase 1) ✅
+  ├─→ C-10 (desafio da fase 1) ✅ ─→ C-40 (relógio do duelo) ✅
   ├─→ C-20 (catálogo fase 2)
   └─→ C-26 (catálogo completo)
 ```

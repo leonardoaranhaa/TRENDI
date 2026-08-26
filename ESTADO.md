@@ -2,7 +2,7 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** 2026-08-25
+**Última atualização:** 2026-08-26
 **Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
@@ -24,7 +24,8 @@ O que está sendo trabalhado agora:
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
 | C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
 | C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ✅ **nova** |
-| C-10 | Desafio fixo da categoria Aura | Claude Code | ✅ **nova** |
+| C-10 | Desafio fixo da categoria Aura | Claude Code | ✅ |
+| C-40 | Relógio do duelo: cada estado respeita o próprio prazo | Claude Code | ✅ **nova** |
 | C-39 | Identidade da marca aplicada ao cliente web | Claude Code | ✅ **nova** |
 | L-20 | Enviar o logotipo em vetor (SVG) | Leonardo | ⬜ **nova** |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
@@ -77,6 +78,20 @@ real**. Quando o duelo muda de estado, o aviso sai de dentro da mesma
 transação que grava a transição (D-26) — então a janela de votação abre no
 mesmo instante para todo mundo, que é o que a legitima. Está provado em
 navegador: a tela vira de EXECUÇÃO para VOTAÇÃO sem recarregar.
+
+**A Fase 1 de código fechou.** Com a `C-40`, o ciclo do duelo anda inteiro
+sozinho: cada estado respeita o próprio prazo, e a votação encerra na hora
+certa sem ninguém clicar. Isso importa mais do que parece — antes, quem
+encerrava o julgamento era um dos julgados.
+
+**Uma correção de rota:** o agendador aparecia em oito comentários como "o
+agendador de C-16", mas a `C-16` é fila e matchmaking, é Fase 2 e faz outra
+coisa. Ele nunca teve tarefa; virou a **C-40** (D-27). De brinde, apareceu
+uma corrida que existia desde a `C-08`: dois competidores clicando ao mesmo
+tempo gravavam duas passagens para a mesma transição. Está fechada.
+
+**O que falta na Fase 1 é seu:** `L-17`, `L-18`, `L-19` e `L-20`. A `C-36`
+(publicar o protótipo) espera `L-01` e `L-17`.
 
 **A `C-10` fechou:** o duelo agora tem desafio. A tabela `challenges` existia
 desde a `C-01` e estava vazia — o estádio dizia "no ar agora" sem dizer *o
@@ -133,6 +148,7 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-26 | C-40: o relógio do duelo — cada estado respeita o próprio prazo, e a votação fecha sozinha (D-27, 279 testes) | Fase 2: C-11 |
 | 2026-08-25 | C-10: o duelo ganha o desafio da Fase 1 (Aura), com tempo, e as telas mostram o que a plateia julga (272 testes + 17 de navegador) | C-16 ou C-11 |
 | 2026-08-25 | C-38: o aviso de estado atravessa da API ao tempo real pelo Postgres, dentro da transação (D-26) | C-10 — desafio Aura |
 | 2026-08-25 | C-39: identidade da marca aplicada ao cliente web — paleta, tipografia, logotipo e os lados do duelo (258 testes + 15 de navegador) | C-38 — aviso de estado |

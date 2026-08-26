@@ -3,7 +3,7 @@
 | Serviço | Função | Fase |
 |---|---|---|
 | **Identidade** | Cadastro, login, verificação de idade, perfis | 1 |
-| **Duelo** | Máquina de estados: fila → aceite → escolha → execução → votação → resultado | 1 · *entregue em C-08 e C-09; timeout automático espera o agendador de C-16* |
+| **Duelo** | Máquina de estados: fila → aceite → escolha → execução → votação → resultado | 1 · *entregue em C-08, C-09 e C-10; o relógio que aplica os prazos é a C-40* |
 | **Mídia** | Integração com fornecedor: criar sala, ingestão, composição, gravação | 1 · *palco, credencial e ciclo da composição entregues em C-03; o quadro em C-05* |
 | **Chat** | WebSocket, três salas por duelo, regra de leitura total e escrita restrita | 1 · *sala única entregue em C-07; as três chegam em C-11* |
 | **Votação** | Recebe votos, aplica pesos cruzados, normaliza, antifraude | 1 · *contagem simples entregue em C-09; peso cruzado em C-14* |
@@ -60,6 +60,16 @@ A primeira linha é a que decide. O aviso sai de dentro da mesma transação que
 **Vai só o estado final da chamada.** O ACEITE é instantâneo, então uma transição pode encadear outras; mandar um aviso por passagem faria a tela piscar, e quem recebe relê o duelo de qualquer jeito.
 
 **O piso continua.** O estádio relê o duelo a cada 3s além de escutar o aviso. É o que cobre a janela entre a conexão do ouvinte cair e a reconexão subir — e é por isso que a `C-06` nasceu com duas fontes.
+
+## O relógio do duelo
+
+Os prazos de cada estado moram em `duel-state.ts` desde a `C-08`. Até a `C-40`, **ninguém os aplicava**: o duelo só andava se um competidor clicasse — e a consequência pior era a janela de votação, que nunca fechava sozinha. Quem encerrava o julgamento acabava sendo um dos julgados.
+
+O relógio roda **dentro da API**, não num processo à parte: é ali que já vivem a transição, o movimento de mídia e o aviso ao tempo real. Ele procura duelo vencido de segundo em segundo e chama a mesma máquina que um clique chamaria.
+
+**A regra continua num lugar só.** A duração de cada estado depende do estado e, em EXECUÇÃO, do `chosen_duration_s` do duelo — escrever isso em SQL seria copiar a regra para o banco. Então o banco filtra grosso ("parado há mais que o menor prazo que existe") e quem decide se venceu é `tick`, em TypeScript.
+
+**Duas coisas não podem mover o duelo duas vezes.** A gravação só vale se o duelo ainda estiver exatamente onde estava quando foi lido. Isso vale para o relógio contra outra instância da API, e também para dois competidores clicando ao mesmo tempo — uma corrida que existia antes e ninguém tinha visto.
 
 ## Serviço de Votação — ordem de operações
 

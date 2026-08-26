@@ -305,7 +305,7 @@ describe('o duelo visto do estádio', () => {
  *
  * Antes disto, `challenge_id` e `chosen_duration_s` eram colunas que ninguém
  * preenchia: a plateia julgava sem saber o que estava sendo executado, e a
- * EXECUÇÃO não tinha duração para a C-16 agendar.
+ * EXECUÇÃO não tinha duração para o relógio (C-40) aplicar.
  */
 describe('o desafio do duelo', () => {
   it('entra quando o duelo chega em ESCOLHA', async () => {
@@ -350,7 +350,7 @@ describe('o desafio do duelo', () => {
     expect((await chamada('GET', `/duels/${duel.id}`)).json().challenge).toBeNull();
   });
 
-  it('dá duração à EXECUÇÃO — é o que a C-16 vai agendar', async () => {
+  it('dá duração à EXECUÇÃO — é o que o relógio da C-40 aplica', async () => {
     const { duel, a } = await duelo('matched');
     await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'both_accepted' });
     await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'choice_closed' });

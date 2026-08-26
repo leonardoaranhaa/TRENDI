@@ -325,6 +325,23 @@ A segunda razão é escala: com HTTP, a API precisaria conhecer o endereço de c
 
 **O que isto não é:** agendador. Timeout automático de estado continua dependendo de alguém clicar até a `C-16`. A `C-38` transporta o aviso; não decide quando o duelo muda.
 
+## D-27 — O relógio do duelo mora na API, e a gravação é condicional
+**Data:** 2026-08-26 **Status:** travada
+
+**O que motivou:** os prazos de cada estado estão escritos desde a `C-08` e **ninguém os aplicava**. Descobriu-se ao procurar a próxima tarefa: o agendador aparecia em oito comentários como "o agendador de C-16", mas a `C-16` é fila e matchmaking, é Fase 2, e faz outra coisa. Ele nunca teve tarefa. Virou a **C-40**.
+
+**Por que isso é grave e não é conveniência:** a janela de votação nunca fechava sozinha. Alguém precisava clicar para encerrar o julgamento do próprio duelo — e esse alguém é um dos julgados.
+
+**Decisão 1: o relógio roda dentro da API.** É onde já vivem a transição, o movimento de mídia e o aviso ao tempo real (D-26). Processo à parte seria mais um para hospedar na `C-36`, sem nada em troca. Liga por ambiente, e o teste o chama à mão com o instante que escolhe.
+
+**Decisão 2: o banco filtra grosso, a regra decide.** A duração depende do estado e, em EXECUÇÃO, do `chosen_duration_s`. Escrever isso em SQL seria copiar a regra para o banco — o erro que a fórmula do voto cruzado e o `COMPOSITION_LAYOUT` evitam ficando num lugar só. A consulta traz "parado há mais que o menor prazo que existe"; `tick` decide.
+
+**Decisão 3: gravação condicional em vez de trava.** A gravação só vale se o duelo ainda estiver exatamente onde estava quando foi lido — estado e instante de entrada. Bloqueio de linha (`FOR UPDATE`) não servia: a persistência já abre a própria transação, e aninhar não funciona.
+
+**O que isso corrigiu de brinde:** dois competidores clicando ao mesmo tempo gravariam duas passagens para a mesma transição. A corrida existia desde a `C-08` e ninguém tinha visto — o relógio só a tornou fácil de reproduzir.
+
+**Custo aceito:** com duas instâncias da API, as duas rodam o relógio e uma perde a corrida em cada duelo. É trabalho jogado fora, e é barato: uma consulta e uma gravação que não conta. A alternativa — eleger uma instância — pede coordenação que a Fase 1 não tem por que ter.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

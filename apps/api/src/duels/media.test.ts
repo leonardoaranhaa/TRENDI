@@ -238,7 +238,8 @@ describe('credencial de publicação', () => {
  *
  * Quando a mídia falha na transição para EXECUÇÃO, o duelo segue — auditoria
  * vale mais que palco — e fica rodando sem ninguém podendo assistir. Sem
- * agendador nesta fase (é a C-16), a segunda chance é o competidor pedindo
+ * agendador quando isto foi escrito (o relógio é a C-40), a segunda chance é
+ * o competidor pedindo
  * credencial.
  */
 
