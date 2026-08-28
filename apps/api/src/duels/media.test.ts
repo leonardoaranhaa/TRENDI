@@ -4,6 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createPrismaClient, createSession, type PrismaClient } from '@trendi/db';
 import { startTestDatabase, type TestDatabase } from '@trendi/db/testing';
 import { FakeVideoProvider, VideoProviderError } from '@trendi/video';
+import { Client as PgClient } from 'pg';
+import { DUEL_STATE_CHANNEL } from '@trendi/shared';
 import { loadConfig } from '../config.js';
 import { buildServer } from '../server.js';
 import { SESSION_COOKIE } from '../auth/session-cookie.js';
@@ -236,7 +238,8 @@ describe('credencial de publicação', () => {
  *
  * Quando a mídia falha na transição para EXECUÇÃO, o duelo segue — auditoria
  * vale mais que palco — e fica rodando sem ninguém podendo assistir. Sem
- * agendador nesta fase (é a C-16), a segunda chance é o competidor pedindo
+ * agendador quando isto foi escrito (o relógio é a C-40), a segunda chance é
+ * o competidor pedindo
  * credencial.
  */
 
@@ -367,5 +370,62 @@ describe('composição que não subiu tem segunda chance', () => {
     expect(corrida.desligadas[0]).not.toBe('composicao-do-outro');
 
     await servidor.close();
+  });
+});
+
+/**
+ * O aviso ao tempo real (C-38).
+ *
+ * A propriedade que motivou usar `LISTEN`/`NOTIFY` em vez de uma chamada
+ * HTTP: o aviso é entregue **pelo commit**. Transição que não gravou não
+ * avisa ninguém — e não dá para errar isso por descuido, porque não é uma
+ * ordem de chamadas, é o banco.
+ *
+ * Precisa de Postgres de verdade: o PGlite que atende sem `DATABASE_URL`
+ * não encaminha notificação assíncrona pelo socket. No CI roda.
+ */
+const COM_POSTGRES = (process.env['DATABASE_URL'] ?? '') !== '';
+
+describe.skipIf(!COM_POSTGRES)('a API avisa o tempo real', () => {
+  it('manda o estado final quando a transição grava', async () => {
+    const ouvinte = new PgClient({ connectionString: database.connectionString });
+    await ouvinte.connect();
+    const avisos: string[] = [];
+    ouvinte.on('notification', (aviso) => avisos.push(aviso.payload ?? ''));
+    await ouvinte.query(`LISTEN ${DUEL_STATE_CHANNEL}`);
+
+    const { duel, a } = await duelo('matched');
+    await evento(duel.id, a.cookie, 'both_accepted');
+
+    await expect.poll(() => avisos.length).toBeGreaterThan(0);
+
+    // O ACEITE é instantâneo e o duelo para em ESCOLHA. Vai um aviso só, com
+    // o estado final: três seguidos só fariam a tela piscar.
+    expect(JSON.parse(avisos[0]!)).toEqual({ duelId: duel.id, state: 'choosing' });
+    expect(avisos).toHaveLength(1);
+
+    await ouvinte.end();
+  });
+
+  it('não avisa quando a transição é recusada', async () => {
+    const ouvinte = new PgClient({ connectionString: database.connectionString });
+    await ouvinte.connect();
+    const avisos: string[] = [];
+    ouvinte.on('notification', (aviso) => avisos.push(aviso.payload ?? ''));
+    await ouvinte.query(`LISTEN ${DUEL_STATE_CHANNEL}`);
+
+    const { duel, a } = await duelo('running');
+    // Evento fora da ordem: o serviço recusa antes de abrir transação.
+    const resposta = await evento(duel.id, a.cookie, 'match_found');
+    expect(resposta.statusCode).toBe(409);
+
+    // Dá tempo de um aviso chegar, se fosse chegar.
+    const outro = await duelo('matched');
+    await evento(outro.duel.id, outro.a.cookie, 'both_accepted');
+    await expect.poll(() => avisos.length).toBeGreaterThan(0);
+
+    expect(avisos.map((a) => JSON.parse(a).duelId)).not.toContain(duel.id);
+
+    await ouvinte.end();
   });
 });

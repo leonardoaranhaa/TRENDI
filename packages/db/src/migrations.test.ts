@@ -1,4 +1,5 @@
 import { execFile } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -166,3 +167,50 @@ describe('migrations', () => {
     expect(colunas).not.toContain('token');
   });
 });
+
+/**
+ * O desafio da Fase 1 (C-10).
+ *
+ * Os valores vivem em dois lugares: no banco, semeados pela migração, e no
+ * `01-conceito/catalogo-desafios.md`, que é onde a decisão de produto foi
+ * escrita. Duplicação sem amarra vira divergência — então aqui a amarra.
+ */
+describe('o desafio da Fase 1', () => {
+  it('está semeado, e é o da categoria Aura', async () => {
+    const { rows } = await client.query(`SELECT * FROM challenges WHERE active`);
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      category: 'aura',
+      name: 'Aura',
+      min_duration_s: 30,
+      max_duration_s: 90,
+      duration_options_s: [30, 60, 90],
+      min_age: 0,
+      // Sem material e sem música é o que tira este desafio do caminho da
+      // licença — e é por isso que ele foi o escolhido para a Fase 1.
+      needs_material: false,
+      needs_music: false,
+    });
+  });
+
+  it('bate com o que o catálogo descreve', async () => {
+    const catalogo = readFileSync(join(packageRoot, '../../01-conceito/catalogo-desafios.md'), 'utf8');
+    const { rows } = await client.query<{
+      name: string;
+      rules: string;
+      judging_criteria: string;
+      duration_options_s: number[];
+    }>(`SELECT name, rules, judging_criteria, duration_options_s FROM challenges WHERE active`);
+    const desafio = rows[0]!;
+
+    // A regra e o critério, sem a primeira letra: o catálogo escreve em
+    // minúscula depois de "Regra:", o banco começa a frase em maiúscula.
+    expect(catalogo.toLowerCase()).toContain(desafio.rules.slice(1).toLowerCase().replace(/\.$/, ''));
+    expect(catalogo.toLowerCase()).toContain('quem dominou a tela');
+    for (const tempo of desafio.duration_options_s) {
+      expect(catalogo).toContain(`${tempo}s`);
+    }
+  });
+});
+

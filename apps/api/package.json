@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "API HTTP: identidade, fila, cat\u00e1logo, ranking",
+  "description": "API HTTP: identidade, fila, catálogo, ranking",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc --build",
@@ -17,8 +17,12 @@
     "@fastify/rate-limit": "^11.2.0",
     "@trendi/db": "*",
     "@trendi/shared": "*",
+    "@trendi/video": "*",
     "arctic": "^3.7.0",
     "fastify": "^5.2.0",
-    "@trendi/video": "*"
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
   }
 }

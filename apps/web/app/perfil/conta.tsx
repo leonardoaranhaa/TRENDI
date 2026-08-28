@@ -13,8 +13,8 @@ import { Aviso, Botao, Campo, Erro } from '../componentes/campos';
  */
 export function Conta({ user }: { user: SessionUser }) {
   return (
-    <section className="flex flex-col gap-6 border-t border-neutral-900 pt-8">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-neutral-500">Conta</h2>
+    <section className="flex flex-col gap-6 border-t border-traco pt-8">
+      <h2 className="text-sm font-semibold uppercase tracking-widest text-tinta-fraca">Conta</h2>
 
       {user.email !== null && <VerificacaoDeEmail verificado={user.emailVerified} />}
       {!user.hasPassword && <CriarSenha />}

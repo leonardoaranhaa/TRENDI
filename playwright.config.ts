@@ -1,15 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Teste de navegador (C-04).
+ * Testes de navegador (C-04 e C-06).
  *
- * A captação é o princípio nº 4 do projeto — sem download —, e isso não se
- * verifica com teste de unidade: precisa de navegador de verdade, pedindo
- * câmera de verdade. O Chrome aceita uma câmera falsa por flag, que é o que
- * torna isso possível sem hardware e sem alguém clicando em "permitir".
+ * Duas coisas que não se verificam com teste de unidade. A captação é o
+ * princípio nº 4 do projeto — sem download —, e precisa de navegador de
+ * verdade pedindo câmera de verdade: o Chrome aceita uma câmera falsa por
+ * flag, que é o que torna isso possível sem hardware e sem alguém clicando
+ * em "permitir". E o estádio precisa provar que **visitante assiste**, o que
+ * só se vê abrindo a página sem cookie nenhum.
  *
- * O `webServer` sobe o cliente já compilado. A API não sobe: esta suíte
- * cobre a tela e a captação; o servidor tem os próprios testes.
+ * O `webServer` sobe o cliente já compilado, mais uma API de mentira que
+ * também fala WebSocket. A API e o tempo real de verdade têm os próprios
+ * testes, contra Postgres de verdade.
  */
 export default defineConfig({
   testDir: './apps/web/testes',

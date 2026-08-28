@@ -19,7 +19,7 @@ export default async function Perfil({
         <h1 className="text-3xl font-bold tracking-tight">
           {params.novo === '1' ? 'Bem-vindo à TRENDI' : 'Seu perfil'}
         </h1>
-        <p className="text-neutral-400">
+        <p className="text-tinta-fraca">
           {params.novo === '1'
             ? 'Escolhemos um nome para você começar. Troque se quiser — é ele que aparece na arquibancada.'
             : 'É assim que você aparece nos duelos.'}

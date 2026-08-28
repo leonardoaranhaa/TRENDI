@@ -136,7 +136,7 @@ export function PublicarCliente({ duelId, side, estadoInicial }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="relative overflow-hidden rounded-xl border border-neutral-800 bg-black">
+      <div className="relative overflow-hidden rounded-xl border border-traco bg-black">
         <video
           ref={videoRef}
           data-testid="previa"
@@ -147,7 +147,7 @@ export function PublicarCliente({ duelId, side, estadoInicial }: Props) {
         />
 
         {publicacao.estado === 'ocioso' && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-neutral-500">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-tinta-fraca">
             Câmera desligada
           </div>
         )}
@@ -159,14 +159,14 @@ export function PublicarCliente({ duelId, side, estadoInicial }: Props) {
           </span>
         )}
 
-        <span className="absolute right-3 top-3 rounded-full border border-neutral-700 bg-neutral-950/80 px-3 py-1 text-xs text-neutral-300">
+        <span className="absolute right-3 top-3 rounded-full border border-traco-aceso bg-preto/80 px-3 py-1 text-xs text-tinta-fraca">
           {LADO[side]}
         </span>
       </div>
 
-      <p data-testid="estado" className="text-sm text-neutral-500">
-        Duelo em <span className="text-neutral-300">{estadoDoDuelo}</span> · publicação{' '}
-        <span className="text-neutral-300">{publicacao.estado}</span>
+      <p data-testid="estado" className="text-sm text-tinta-fraca">
+        Duelo em <span className="text-tinta-fraca">{estadoDoDuelo}</span> · publicação{' '}
+        <span className="text-tinta-fraca">{publicacao.estado}</span>
       </p>
 
       {publicacao.erro !== null && <Erro>{MENSAGEM_DE_ERRO[publicacao.erro]}</Erro>}
@@ -196,14 +196,14 @@ export function PublicarCliente({ duelId, side, estadoInicial }: Props) {
             <button
               type="button"
               onClick={alternarVideo}
-              className="rounded-lg border border-neutral-700 px-4 py-2 text-sm transition hover:border-neutral-500"
+              className="rounded-lg border border-traco-aceso px-4 py-2 text-sm transition hover:border-azul"
             >
               {publicacao.comVideo ? 'Cortar câmera' : 'Voltar câmera'}
             </button>
             <button
               type="button"
               onClick={alternarAudio}
-              className="rounded-lg border border-neutral-700 px-4 py-2 text-sm transition hover:border-neutral-500"
+              className="rounded-lg border border-traco-aceso px-4 py-2 text-sm transition hover:border-azul"
             >
               {publicacao.comAudio ? 'Cortar microfone' : 'Voltar microfone'}
             </button>

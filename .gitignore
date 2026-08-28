@@ -9,3 +9,7 @@ next-env.d.ts
 packages/db/src/generated/
 test-results/
 playwright-report/
+
+# Binários do player do IVS: entram no build, não no repositório.
+# Quem os põe lá é apps/web/scripts/copiar-player.mjs.
+apps/web/public/ivs/

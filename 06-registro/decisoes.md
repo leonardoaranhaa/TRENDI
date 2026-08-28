@@ -271,6 +271,77 @@ Formato: o que foi decidido, quando, por quê, e o que foi descartado.
 
 **O que ainda não está provado:** que o IVS de fato coloca `'a'` à esquerda. O teste prova que mandamos `participantOrderAttribute: 'side'`; a ordem só a AWS responde, e a conta existe depois de `L-19` — onde isso virou item de checklist.
 
+## D-23 — Assistir não pede conta; falar e votar pedem
+**Data:** 2026-08-24 **Status:** travada
+
+**Decisão:** o estádio abre para qualquer pessoa. Visitante vê o duelo, o estado, quem está duelando e o resultado. Conta só entra em cena para escrever no chat e para votar.
+
+**Por quê:** decisão do Leonardo. A plataforma cresce por link e por clipe — é o que a `C-21` existe para produzir —, e link que morre numa tela de cadastro não cresce nada. A fricção fica onde há contrapartida: para votar, a conta é o que sustenta "uma conta, um voto" e o antifraude das regras §6.
+
+**O custo, escrito para não ser esquecido:** pico de espectador anônimo consome entrega, que é ~97% da conta (D-20) e vira conta sem virar conta de usuário. Se isso apertar, o lugar de mexer é teto de espectador simultâneo por duelo — que a `visao-geral.md` já lista como mitigação —, não a porta do estádio.
+
+**Consequência no código:** `GET /duels/:duelId` responde sem sessão, e o estádio nunca redireciona para o login. A parede só aparece onde existe ação atrás dela: é o que `situacaoDaPlateia` decide, e o que os testes de navegador provam abrindo a página sem cookie nenhum.
+
+## D-24 — Player do IVS para a plateia
+**Data:** 2026-08-24 **Status:** travada, com o mesmo gatilho da D-20
+
+**Decisão:** quem assiste usa o `amazon-ivs-player`, do fornecedor já escolhido na D-20, isolado em `apps/web/lib/ivs-player.ts` com `import()` dinâmico. Os binários de worker e wasm são servidos por nós, copiados no build — não pelo CDN do fornecedor.
+
+**Por quê:** o player do IVS entende LL-HLS de verdade, e latência é o que legitima o voto — plateia atrasada julga outro instante (princípio 5). A alternativa neutra, `hls.js`, tocaria HLS de qualquer origem, mas com suporte genérico a baixa latência: o ganho de portabilidade sai do lugar errado.
+
+**O que compensa o acoplamento:** o SDK entra por um arquivo só, como o de captação da C-04. Quando o gatilho de revisão da D-20 disparar, trocar de player é trocar esse arquivo.
+
+**Servir os binários daqui** evita que cada espectador dependa de um terceiro para o vídeo abrir. São ~1,6 MB: entram no build (`apps/web/scripts/copiar-player.mjs`), não no repositório.
+
+## D-25 — A identidade da marca aplicada ao produto
+**Data:** 2026-08-25 **Status:** travada
+
+**Decisão:** o cliente web veste a identidade da TRENDI — azul `#0132FF`, branco e preto, sobre preto de verdade, com o escuro subindo em azul-noite (`#00061A`) e nunca em cinza-neutro. Tipografia Montserrat, servida por nós. O brilho azul é assinatura, não enfeite: aparece atrás do logotipo em toda peça de marca, e aparece na tela.
+
+**A descoberta que mudou uma coisa:** `#0132FF` sobre preto dá **2,9:1** de contraste — abaixo do mínimo legível para texto. Ele é cor de **preenchimento**: botão, chip, borda acesa, brilho. Onde o texto precisa ser azul, entra o mesmo azul clareado até passar em AA (`#5B82FF`, 6,1:1). Não é desvio da identidade; é o que faz a identidade ser lida em celular no ônibus. Tem teste (`identidade.test.ts`), porque `text-azul` é o que qualquer um escreveria primeiro.
+
+**Os lados do duelo: azul contra branco.** Decisão do Leonardo, mantendo a paleta de três cores intacta em vez de acrescentar um contra-acento quente. O risco que isso corre é assimetria — um lado vestindo a marca e o outro a ausência dela, num produto cuja tese é simetria. A compensação é de peso, e é regra: os dois lados são **preenchimento sólido**, mesmo tamanho, mesma tipografia, e **os dois acendem** (o lado B com brilho branco). Nenhum dos dois é contorno. Se algum dia um lado ganhar tratamento que o outro não tem, isso vira mentira sobre o placar.
+
+**O logotipo é lettering desenhado à mão** — não é fonte, e não se compõe com CSS. Entra como imagem, num componente só (`componentes/marca.tsx`), para a troca pelo vetor ser um arquivo. O arquivo atual foi **extraído do quadro de identidade** em 615px: serve para tela, não para impressão nem ampliação. O SVG é a `L-20`.
+
+**A fonte vem do npm e é servida daqui**, não de `fonts.googleapis.com` — mesmo motivo dos binários do player (D-24): ninguém deveria depender de um terceiro para a página abrir com a cara certa, e build que busca na rede é build que quebra sozinho.
+
+**O que a peça de marca traz e o produto não segue:** o quadro de identidade mostra aplicações em Twitch, YouTube, Kick e TikTok Live. Isso é colateral de marketing. A TRENDI é ambiente próprio — não embutimos live de terceiro (é o princípio nº 4 e a razão da D-01). As peças servem à divulgação; a arquitetura não muda por causa delas.
+
+## D-26 — O aviso de estado atravessa pelo Postgres, não por HTTP
+**Data:** 2026-08-25 **Status:** travada
+
+**Decisão:** quando o duelo muda de estado, a API dispara `pg_notify` no canal `duelo_estado`, **dentro da transação que grava a transição**. O servidor de tempo real escuta com uma conexão dedicada e repassa para a sala.
+
+**Por quê, e a razão principal não é a óbvia.** A óbvia é não acrescentar infraestrutura — verdade, mas HTTP também não acrescentaria. A que decide é esta: `pg_notify` numa transação **só é entregue se ela der certo**. Avisar de uma transição que não gravou passa a ser impossível por construção, em vez de depender de alguém manter a ordem certa das chamadas. É este aviso que abre a janela de votação na tela de todo mundo; se ele mentir, o duelo mente.
+
+A segunda razão é escala: com HTTP, a API precisaria conhecer o endereço de cada instância de tempo real. Esquecer uma significaria metade da plateia com a janela atrasada — exatamente o defeito que a `C-38` existe para matar, voltando pela porta dos fundos.
+
+**Vai só o estado final da chamada.** O ACEITE é instantâneo e encadeia transições; um aviso por passagem faria a tela piscar, e quem recebe relê o duelo de qualquer jeito.
+
+**A releitura periódica do estádio fica.** Ela é o piso enquanto a conexão do ouvinte cai e volta. Duas fontes para o mesmo fato não é redundância à toa: é o que a `C-06` já previa.
+
+**Custo aceito:** o tempo real passa a exigir `DATABASE_URL` — antes ele só precisava dela para o histórico do chat, agora sem ela não há aviso nenhum, e o processo recusa subir dizendo isso.
+
+**O que isto não é:** agendador. Timeout automático de estado continua dependendo de alguém clicar até a `C-16`. A `C-38` transporta o aviso; não decide quando o duelo muda.
+
+## D-27 — O relógio do duelo mora na API, e a gravação é condicional
+**Data:** 2026-08-26 **Status:** travada
+
+**O que motivou:** os prazos de cada estado estão escritos desde a `C-08` e **ninguém os aplicava**. Descobriu-se ao procurar a próxima tarefa: o agendador aparecia em oito comentários como "o agendador de C-16", mas a `C-16` é fila e matchmaking, é Fase 2, e faz outra coisa. Ele nunca teve tarefa. Virou a **C-40**.
+
+**Por que isso é grave e não é conveniência:** a janela de votação nunca fechava sozinha. Alguém precisava clicar para encerrar o julgamento do próprio duelo — e esse alguém é um dos julgados.
+
+**Decisão 1: o relógio roda dentro da API.** É onde já vivem a transição, o movimento de mídia e o aviso ao tempo real (D-26). Processo à parte seria mais um para hospedar na `C-36`, sem nada em troca. Liga por ambiente, e o teste o chama à mão com o instante que escolhe.
+
+**Decisão 2: o banco filtra grosso, a regra decide.** A duração depende do estado e, em EXECUÇÃO, do `chosen_duration_s`. Escrever isso em SQL seria copiar a regra para o banco — o erro que a fórmula do voto cruzado e o `COMPOSITION_LAYOUT` evitam ficando num lugar só. A consulta traz "parado há mais que o menor prazo que existe"; `tick` decide.
+
+**Decisão 3: gravação condicional em vez de trava.** A gravação só vale se o duelo ainda estiver exatamente onde estava quando foi lido — estado e instante de entrada. Bloqueio de linha (`FOR UPDATE`) não servia: a persistência já abre a própria transação, e aninhar não funciona.
+
+**O que isso corrigiu de brinde:** dois competidores clicando ao mesmo tempo gravariam duas passagens para a mesma transição. A corrida existia desde a `C-08` e ninguém tinha visto — o relógio só a tornou fácil de reproduzir.
+
+**Custo aceito:** com duas instâncias da API, as duas rodam o relógio e uma perde a corrida em cada duelo. É trabalho jogado fora, e é barato: uma consulta e uma gravação que não conta. A alternativa — eleger uma instância — pede coordenação que a Fase 1 não tem por que ter.
+
 ## MODELO PARA NOVAS DECISÕES
 
 ```

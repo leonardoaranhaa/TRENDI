@@ -2,7 +2,7 @@
 
 > **Atualizar ao fim de toda sessão de trabalho.**
 
-**Última atualização:** 2026-08-24
+**Última atualização:** 2026-08-26
 **Fase atual:** Fase 0 quase fechada — o portão só espera nome, CNPJ e parecer jurídico. A frente técnica da Fase 1 corre em paralelo.
 **Nome de trabalho:** TRENDI *(não confirmado — depende de L-01)*
 
@@ -22,7 +22,12 @@ O que está sendo trabalhado agora:
 | C-03 | Integrar o SDK de vídeo | Claude Code | ✅ |
 | C-04 | Captação WebRTC do navegador | Claude Code | ✅ |
 | C-05 | Composição split-screen no servidor | Claude Code | ✅ **nova** |
-| C-06 | Sala de duelo: página do estádio | Claude Code | ⬜ próxima |
+| C-06 | Sala de duelo: página do estádio | Claude Code | ✅ **nova** |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | Claude Code | ✅ **nova** |
+| C-10 | Desafio fixo da categoria Aura | Claude Code | ✅ |
+| C-40 | Relógio do duelo: cada estado respeita o próprio prazo | Claude Code | ✅ **nova** |
+| C-39 | Identidade da marca aplicada ao cliente web | Claude Code | ✅ **nova** |
+| L-20 | Enviar o logotipo em vetor (SVG) | Leonardo | ⬜ **nova** |
 | C-01 | Repositório, stack base, convenções | Claude Code | ✅ |
 | C-08 | Máquina de estados do duelo | Claude Code | ✅ |
 | C-14 | Fórmula do voto cruzado | Claude Code | 🟡 fórmula e casos-limite prontos; falta plugar em C-09 e C-12 |
@@ -63,12 +68,56 @@ O que está sendo trabalhado agora:
 2. **L-01** — verificar domínio, INPI e redes para "TRENDI". É barato, rápido, e destrava identidade visual e CNPJ.
 3. **L-02** — agendar consulta jurídica. Demora a acontecer, então começar cedo.
 
-**A fila de código segue andando.** `C-05` fechou: o quadro do duelo agora
-tem lado fixo — A à esquerda, B à direita, em todo duelo (D-22). Sem isso a
-ordem seria a de chegada, e o placar em DOM sobre o vídeo passaria a apontar
-para o competidor errado. O caminho segue em `C-06` (estádio), com `C-10` em
-paralelo. Nada espera você: sem a conta AWS, a tela roda em modo local e diz
-isso na cara.
+**A fila de código segue andando.** `C-06` fechou, e é a primeira vez que o
+produto existe para quem não está duelando: o estádio junta o quadro montado
+no servidor, o chat e a votação — três coisas que estavam prontas e não se
+falavam. **Assistir não pede conta** (D-23); falar e votar, sim.
+
+O buraco que a `C-06` revelou está fechado: **a `C-38` ligou a API ao tempo
+real**. Quando o duelo muda de estado, o aviso sai de dentro da mesma
+transação que grava a transição (D-26) — então a janela de votação abre no
+mesmo instante para todo mundo, que é o que a legitima. Está provado em
+navegador: a tela vira de EXECUÇÃO para VOTAÇÃO sem recarregar.
+
+**A Fase 1 de código fechou.** Com a `C-40`, o ciclo do duelo anda inteiro
+sozinho: cada estado respeita o próprio prazo, e a votação encerra na hora
+certa sem ninguém clicar. Isso importa mais do que parece — antes, quem
+encerrava o julgamento era um dos julgados.
+
+**Uma correção de rota:** o agendador aparecia em oito comentários como "o
+agendador de C-16", mas a `C-16` é fila e matchmaking, é Fase 2 e faz outra
+coisa. Ele nunca teve tarefa; virou a **C-40** (D-27). De brinde, apareceu
+uma corrida que existia desde a `C-08`: dois competidores clicando ao mesmo
+tempo gravavam duas passagens para a mesma transição. Está fechada.
+
+**O que falta na Fase 1 é seu:** `L-17`, `L-18`, `L-19` e `L-20`. A `C-36`
+(publicar o protótipo) espera `L-01` e `L-17`.
+
+**A `C-10` fechou:** o duelo agora tem desafio. A tabela `challenges` existia
+desde a `C-01` e estava vazia — o estádio dizia "no ar agora" sem dizer *o
+quê*, e a plateia julgava desempenho sem saber o que estava sendo executado.
+Agora o desafio da Fase 1 (Aura / Presença, do catálogo) entra no duelo ao
+chegar em ESCOLHA, com 60s — a opção do meio, porque escolher pelo público é
+a `C-19`. De quebra, a EXECUÇÃO passou a ter duração: é o que a `C-16` vai
+agendar.
+
+Nada espera você: sem a conta AWS, a tela diz na cara que não há vídeo
+saindo dali.
+
+**A plataforma agora tem a cara da marca (D-25).** Preto de verdade, azul
+`#0132FF` e Montserrat, com o escuro subindo em azul-noite — nada de cinza
+genérico. Os lados do duelo ficaram azul contra branco, dentro da paleta,
+como você escolheu; para os dois não parecerem ter pesos diferentes, os dois
+são preenchimento sólido e os dois acendem.
+
+Uma coisa apareceu ao medir: **o azul da marca não serve para texto** sobre
+preto (2,9:1 de contraste, abaixo do legível). Ele preenche — botão, chip,
+brilho. Onde o texto precisa ser azul, entra o mesmo azul clareado. Tem teste
+para não se perder.
+
+**`L-20`, sua e rápida:** mandar o logotipo em **vetor (SVG)**. O que está no
+ar foi extraído do quadro de identidade em 615px — serve para tela, não para
+impressão nem para ampliar.
 
 **Entrou item no seu `L-19`:** criar a *encoder configuration* de 720p (é ela
 que fixa a qualidade e o custo da entrega) e conferir, com a conta na mão, que
@@ -99,6 +148,11 @@ Fase 0 não tem métrica de produto. O portão de saída é (nada aqui depende d
 
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
+| 2026-08-26 | C-40: o relógio do duelo — cada estado respeita o próprio prazo, e a votação fecha sozinha (D-27, 279 testes) | Fase 2: C-11 |
+| 2026-08-25 | C-10: o duelo ganha o desafio da Fase 1 (Aura), com tempo, e as telas mostram o que a plateia julga (272 testes + 17 de navegador) | C-16 ou C-11 |
+| 2026-08-25 | C-38: o aviso de estado atravessa da API ao tempo real pelo Postgres, dentro da transação (D-26) | C-10 — desafio Aura |
+| 2026-08-25 | C-39: identidade da marca aplicada ao cliente web — paleta, tipografia, logotipo e os lados do duelo (258 testes + 15 de navegador) | C-38 — aviso de estado |
+| 2026-08-24 | C-06: estádio — visitante assiste, chat conectado, voto na tela e placar só no fim (255 testes + 15 de navegador) | C-38 — aviso de estado |
 | 2026-08-24 | C-05: quadro do duelo com lado fixo, qualidade escrita e segunda chance para a composição (238 testes) | C-06 — estádio |
 | 2026-08-21 | C-04: tela do competidor, captação sem download, modo local e 5 testes de navegador (233 + 5) | C-05 — composição |
 | 2026-08-20 | C-03: camada de mídia atrás de interface, com fornecedor falso e adaptador IVS (220 testes) | C-04 — captação no navegador |

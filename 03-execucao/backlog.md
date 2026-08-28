@@ -32,15 +32,19 @@
 | C-03 | Integrar SDK do fornecedor de vídeo | C | ✅ | — |
 | C-04 | Captação WebRTC do navegador (sem download) | C | ✅ | C-03 |
 | C-05 | Composição split-screen no servidor | C | ✅ | C-04 |
-| C-06 | Sala de duelo: página do estádio, versão mínima | C | ⬜ | C-05 |
+| C-06 | Sala de duelo: página do estádio, versão mínima | C | ✅ | C-05 |
 | C-07 | Chat único por WebSocket | C | ✅ | C-01 |
 | C-08 | Máquina de estados do duelo | C | ✅ | C-01 |
 | C-09 | Votação simples (sem peso cruzado) | C | ✅ | C-08 |
-| C-10 | Desafio fixo da categoria Aura | C | ⬜ | — |
+| C-10 | Desafio fixo da categoria Aura | C | ✅ | — |
 | C-37 | Conta nativa: cadastro, login, verificação e recuperação | C | ✅ | C-02 |
+| C-38 | A API avisa o tempo real quando o duelo muda de estado | C | ✅ | C-06 |
+| C-39 | Identidade da marca aplicada ao cliente web | C | ✅ | C-06 |
+| C-40 | Relógio do duelo: cada estado respeita o próprio prazo | C | ✅ | C-08, C-10 |
 | L-17 | Registrar apps OAuth no Google e no Discord | L | ⬜ | — |
 | L-18 | Contratar provedor de e-mail transacional | L | ⬜ | L-01 |
 | L-19 | Criar conta AWS e habilitar IVS | L | ⬜ | — |
+| L-20 | Enviar o logotipo da TRENDI em vetor (SVG) | L | ⬜ | — |
 | C-36 | Publicar o protótipo (Vercel + Fly + Supabase) | C | ⬜ | C-02, L-01, L-17 |
 
 > **A fila voltou a andar.** `L-03` e `L-06` foram resolvidas em 2026-08-20 —
@@ -77,6 +81,11 @@
 | C-14 | Voto cruzado completo com todos os casos-limite | C | 🟡 | C-09, C-12 |
 | C-15 | Antifraude de voto | C | ⬜ | C-14 |
 | C-16 | Fila e matchmaking por faixa de audiência | C | ⬜ | C-08 |
+
+> **A C-16 não é o agendador.** Ela cria e pareia duelos. Fazer o duelo que
+> já existe respeitar o próprio prazo é a **C-40**, na Fase 1 — os dois
+> andaram confundidos por um comentário antigo que dizia que o agendador
+> "chega com a fila".
 | C-17 | Penalidade progressiva e reabilitação | C | ⬜ | C-16, L-09 |
 | C-18 | Fluxo de contestação de desistência | C | ⬜ | C-17 |
 | C-19 | Escolha de desafio + tempo pelo público | C | ⬜ | C-10, C-12 |

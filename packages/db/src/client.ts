@@ -2,7 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from './generated/prisma/client.js';
 
 export { PrismaClient };
-export type { User, Account, Session, Duel } from './generated/prisma/client.js';
+export type { User, Account, Session, Duel, Challenge } from './generated/prisma/client.js';
 
 /**
  * Cliente do banco.

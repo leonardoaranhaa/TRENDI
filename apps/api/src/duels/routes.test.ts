@@ -3,6 +3,7 @@ import type { FastifyInstance, InjectOptions } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createPrismaClient, createSession, type PrismaClient } from '@trendi/db';
 import { startTestDatabase, type TestDatabase } from '@trendi/db/testing';
+import { stateDurationMs } from '@trendi/shared';
 import { loadConfig } from '../config.js';
 import { buildServer } from '../server.js';
 import { SESSION_COOKIE } from '../auth/session-cookie.js';
@@ -247,3 +248,117 @@ describe('o que aparece durante e depois', () => {
     expect(response.statusCode).toBe(404);
   });
 });
+
+describe('o duelo visto do estádio', () => {
+  it('sai com nome dos dois competidores, não com UUID', async () => {
+    const { duel, a, b } = await duelo('running');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+    const { competitors } = resposta.json();
+
+    expect(competitors.a.id).toBe(a.id);
+    expect(competitors.b.id).toBe(b.id);
+    expect(competitors.a.handle).toMatch(/^criador_a_/);
+    expect(competitors.b.handle).toMatch(/^criador_b_/);
+  });
+
+  it('não vaza e-mail de quem está duelando', async () => {
+    // `publicUser` serve para quem está logado ver a própria conta. O estádio
+    // é outra coisa: e-mail e situação de senha não são da plateia.
+    const { duel, a } = await duelo('running');
+    await prisma.user.update({ where: { id: a.id }, data: { email: 'a@trendi.test' } });
+
+    const { competitors } = (await chamada('GET', `/duels/${duel.id}`)).json();
+
+    expect(competitors.a).toEqual({
+      id: a.id,
+      handle: expect.stringMatching(/^criador_a_/),
+      displayName: null,
+      avatarUrl: null,
+    });
+  });
+
+  it('responde para visitante — assistir não pede conta', async () => {
+    const { duel } = await duelo('running');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+
+    expect(resposta.statusCode).toBe(200);
+    expect(resposta.json().duel.state).toBe('running');
+    // Visitante não tem voto para lembrar, e não é erro: é visitante.
+    expect(resposta.json().voting.yourVote).toBeNull();
+  });
+
+  it('não devolve apuração enquanto a votação está aberta', async () => {
+    // A regra é do produto: placar que anda ao vivo empurra quem ainda não
+    // votou para o lado que está ganhando.
+    const { duel } = await duelo('voting');
+
+    const resposta = await chamada('GET', `/duels/${duel.id}`);
+
+    expect(resposta.json().voting.tally).toBeNull();
+  });
+});
+
+/**
+ * O desafio da Fase 1 no duelo (C-10).
+ *
+ * Antes disto, `challenge_id` e `chosen_duration_s` eram colunas que ninguém
+ * preenchia: a plateia julgava sem saber o que estava sendo executado, e a
+ * EXECUÇÃO não tinha duração para o relógio (C-40) aplicar.
+ */
+describe('o desafio do duelo', () => {
+  it('entra quando o duelo chega em ESCOLHA', async () => {
+    const { duel, a } = await duelo('matched');
+
+    // O ACEITE é instantâneo, então este evento leva direto a ESCOLHA.
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'both_accepted' });
+
+    const gravado = await prisma.duel.findUniqueOrThrow({ where: { id: duel.id } });
+    expect(gravado.state).toBe('choosing');
+    expect(gravado.challengeId).toBeTruthy();
+    // O tempo é a opção do meio do catálogo: nem o mais fácil, nem o mais
+    // difícil. Escolher pelo público é a C-19.
+    expect(gravado.chosenDurationS).toBe(60);
+  });
+
+  it('não entra antes da ESCOLHA', async () => {
+    const { duel, a } = await duelo('queued');
+
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'match_found' });
+
+    const gravado = await prisma.duel.findUniqueOrThrow({ where: { id: duel.id } });
+    expect(gravado.challengeId).toBeNull();
+  });
+
+  it('sai na rota de leitura, com o que a plateia julga', async () => {
+    const { duel, a } = await duelo('matched');
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'both_accepted' });
+
+    const { challenge } = (await chamada('GET', `/duels/${duel.id}`)).json();
+
+    expect(challenge).toMatchObject({ name: 'Aura', durationS: 60 });
+    expect(challenge.rules).toMatch(/presença/i);
+    // Não é regra que a plataforma faz cumprir (D-21): é a frase que diz à
+    // arquibancada o que ela está julgando.
+    expect(challenge.judgingCriteria).toMatch(/dominou a tela/i);
+  });
+
+  it('vem nulo enquanto o duelo não tem desafio', async () => {
+    const { duel } = await duelo('queued');
+
+    expect((await chamada('GET', `/duels/${duel.id}`)).json().challenge).toBeNull();
+  });
+
+  it('dá duração à EXECUÇÃO — é o que o relógio da C-40 aplica', async () => {
+    const { duel, a } = await duelo('matched');
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'both_accepted' });
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'choice_closed' });
+    await chamada('POST', `/duels/${duel.id}/events`, a.cookie, { event: 'preparation_done' });
+
+    const rodando = await prisma.duel.findUniqueOrThrow({ where: { id: duel.id } });
+    expect(rodando.state).toBe('running');
+    expect(stateDurationMs({ state: 'running', enteredAt: 0, executionMs: rodando.chosenDurationS! * 1000 })).toBe(60_000);
+  });
+});
+

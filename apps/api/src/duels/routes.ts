@@ -7,6 +7,8 @@ import type { VideoProvider } from '@trendi/video';
 import {
   applyDuelEvent,
   castVote,
+  challengeView,
+  competitorView,
   duelView,
   issuePublishCredential,
   voteStatus,
@@ -46,16 +48,36 @@ const STATUS: Record<DuelProblem, number> = {
 export async function duelRoutes(app: FastifyInstance, options: DuelRoutesOptions): Promise<void> {
   const { config, prisma, video } = options;
 
+  /**
+   * O duelo como a plateia o vê.
+   *
+   * **Sem sessão também responde**: assistir não pede conta — falar e votar,
+   * sim. É o que deixa link e clipe circularem sem parede de cadastro.
+   *
+   * Os dois competidores saem com nome: estádio que mostra UUID no lugar de
+   * quem está duelando não é estádio.
+   */
   app.get('/duels/:duelId', async (request, reply) => {
     const { duelId } = request.params as { duelId: string };
-    const duel = await prisma.duel.findUnique({ where: { id: duelId } });
+    const duel = await prisma.duel.findUnique({
+      where: { id: duelId },
+      include: { userA: true, userB: true, challenge: true },
+    });
     if (duel === null) return reply.code(404).send({ error: 'duelo_nao_encontrado' });
 
     const user = await currentUser(prisma, config, request, reply);
     const status = await voteStatus(prisma, duelId, user?.id ?? null);
     if ('problem' in status) return reply.code(STATUS[status.problem]).send({ error: status.problem });
 
-    return { duel: duelView(duel), voting: status };
+    return {
+      duel: duelView(duel),
+      competitors: { a: competitorView(duel.userA), b: competitorView(duel.userB) },
+      // Nulo até o duelo entrar em ESCOLHA. A plateia precisa saber o que
+      // está julgando — sem isso o voto mede o quê?
+      challenge:
+        duel.challenge === null ? null : challengeView(duel.challenge, duel.chosenDurationS),
+      voting: status,
+    };
   });
 
   /**

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { corpoDoErro, mensagemDoErro } from '../../lib/mensagens';
 import { Aviso, Botao, Campo, Erro } from '../componentes/campos';
+import { MarcaLink } from '../componentes/marca';
 
 function Formulario() {
   const router = useRouter();
@@ -74,16 +75,18 @@ function Formulario() {
 export default function RedefinirSenha() {
   return (
     <main className="mx-auto flex max-w-md flex-col gap-8 px-6 py-24">
+      <MarcaLink />
+
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Nova senha</h1>
-        <p className="text-neutral-400">Escolha uma que você lembre e ninguém adivinhe.</p>
+        <p className="text-tinta-fraca">Escolha uma que você lembre e ninguém adivinhe.</p>
       </header>
 
       <Suspense fallback={<Aviso>Carregando…</Aviso>}>
         <Formulario />
       </Suspense>
 
-      <Link href="/entrar" className="text-sm text-neutral-500 underline underline-offset-4">
+      <Link href="/entrar" className="text-sm text-tinta-fraca underline underline-offset-4">
         Voltar para entrar
       </Link>
     </main>

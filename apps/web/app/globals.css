@@ -1,1 +1,66 @@
 @import 'tailwindcss';
+
+/**
+ * A identidade da TRENDI, em tokens.
+ *
+ * A paleta é de três cores: azul, branco e preto. O fundo é preto de
+ * verdade — não cinza —, e as superfícies sobem em azul-noite, não em
+ * cinza-neutro. Foi assim que a marca foi desenhada, e é o que separa a
+ * tela da TRENDI de qualquer painel escuro genérico.
+ *
+ * **O azul da marca não é cor de texto.** `#0132FF` sobre preto dá 2,9:1 de
+ * contraste, abaixo do mínimo legível — ele é cor de preenchimento, de
+ * brilho e de borda acesa. Onde o texto precisa ser azul, entra o
+ * `--color-eletrico`, que é o mesmo azul clareado até passar em AA (6,1:1).
+ * Isso não é desvio da identidade: é o que faz a identidade ser lida.
+ *
+ * A tipografia vem do npm e é servida por nós, pelo mesmo motivo dos
+ * binários do player — ninguém deveria depender de um terceiro para a
+ * página abrir com a cara certa.
+ */
+@import '@fontsource/montserrat/latin-400.css';
+@import '@fontsource/montserrat/latin-500.css';
+@import '@fontsource/montserrat/latin-600.css';
+@import '@fontsource/montserrat/latin-700.css';
+
+@theme {
+  /* As três da marca. */
+  --color-azul: #0132ff;
+  --color-branco: #ffffff;
+  --color-preto: #000000;
+
+  /* O azul, clareado até virar legível como texto. */
+  --color-eletrico: #5b82ff;
+
+  /* Superfícies: o escuro sobe em azul-noite, nunca em cinza. */
+  --color-noite: #00061a;
+  --color-noite-alta: #000c2e;
+
+  /* Traços. Baixo contraste de propósito: a borda insinua, o brilho marca. */
+  --color-traco: #000a44;
+  --color-traco-aceso: #16277a;
+
+  /* Texto secundário, em azul frio em vez de cinza. */
+  --color-tinta-fraca: #96a3cc;
+
+  --font-sans:
+    'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* O brilho é assinatura da marca, não enfeite: aparece em todo quadro. */
+  --shadow-brilho: 0 0 24px -4px rgb(1 50 255 / 0.55);
+  --shadow-brilho-forte: 0 0 48px -8px rgb(1 50 255 / 0.75);
+  /* O mesmo brilho, para o lado branco do duelo. Os dois lados acendem: um
+     lado que brilha e outro que não parecem ter pesos diferentes, e num
+     duelo isso é mentira sobre o placar. */
+  --shadow-brilho-branco: 0 0 24px -4px rgb(255 255 255 / 0.4);
+}
+
+/**
+ * Rótulos e frases curtas em caixa alta com entreletra larga — é a voz da
+ * marca nos quadros, e o contraponto ao lettering do logotipo.
+ */
+@utility voz-da-marca {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+}

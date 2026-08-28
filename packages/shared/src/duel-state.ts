@@ -224,7 +224,8 @@ export function applyEvent(
 
 /**
  * Avança o relógio. Devolve `null` quando não há nada vencido — é o que o
- * agendador chama em laço para que nenhum duelo fique preso num estado.
+ * relógio do duelo (C-40) chama em laço, para que nenhum duelo fique preso
+ * num estado.
  */
 export function tick(snapshot: DuelSnapshot, now: number): TransitionResult | null {
   if (!isTimedOut(snapshot, now)) return null;

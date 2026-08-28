@@ -1,7 +1,12 @@
-import type { DuelState, Stand } from '@trendi/shared';
+import type { DuelState } from './duel-state.js';
+import type { Stand } from './domain.js';
 
 /**
  * O que cliente e servidor trocam no chat do duelo (C-07).
+ *
+ * Mora em `shared` porque é contrato de fio entre dois lados: o servidor de
+ * tempo real e o estádio no navegador (C-06). Tipo de fio que só um lado
+ * enxerga é como divergência começa.
  *
  * Hoje é um chat só por duelo. A mensagem já carrega a arquibancada de quem
  * escreveu porque a Fase 2 divide isso em três salas com escrita restrita

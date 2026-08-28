@@ -1,6 +1,6 @@
 import type { WebSocket } from 'ws';
 import type { Stand } from '@trendi/shared';
-import type { ServerMessage } from './protocol.js';
+import type { ServerMessage } from '@trendi/shared';
 
 /**
  * Salas do tempo real.

@@ -1,6 +1,7 @@
-import type { Duel, PrismaClient } from '@trendi/db';
+import type { Challenge, Duel, PrismaClient, User } from '@trendi/db';
 import type { PublishCredential, VideoProvider } from '@trendi/video';
 import {
+  DUEL_STATE_CHANNEL,
   applyEvent,
   stateDurationMs,
   tallySimpleVote,
@@ -9,6 +10,7 @@ import {
   type DuelSnapshot,
   type DuelState,
   type DuelTransition,
+  type TransitionResult,
   type Side,
   type SimpleTally,
   type Stand,
@@ -22,7 +24,7 @@ import {
  * `duel_transitions` — auditoria é requisito, não luxo (convenção 3).
  *
  * Quem move o duelo, nesta fase, são os dois competidores. Timeout automático
- * depende de um agendador, que chega com a fila (C-16); até lá o duelo anda
+ * depende do relógio (C-40); os competidores também movem o duelo clicando,
  * porque alguém clica, que é o "tudo manual" previsto para a Fase 1.
  */
 
@@ -70,6 +72,52 @@ export function duelView(duel: Duel): DuelView {
 }
 
 /**
+ * Um competidor como a plateia o vê (C-06).
+ *
+ * De propósito menor que o `publicUser` do login: e-mail e situação de senha
+ * são da conta de quem está logado, não do estádio inteiro.
+ */
+export interface CompetitorView {
+  readonly id: string;
+  readonly handle: string;
+  readonly displayName: string | null;
+  readonly avatarUrl: string | null;
+}
+
+/**
+ * O desafio como a plateia o vê (C-10).
+ *
+ * `judgingCriteria` **não é regra que a plataforma faz cumprir** — é a frase
+ * que diz à arquibancada o que ela está julgando (D-21). Quem faz cumprir
+ * são as três regras de conduta.
+ */
+export interface ChallengeView {
+  readonly name: string;
+  readonly rules: string;
+  readonly judgingCriteria: string;
+  /** Quanto tempo a execução vai durar, em segundos. */
+  readonly durationS: number | null;
+}
+
+export function challengeView(challenge: Challenge, chosenDurationS: number | null): ChallengeView {
+  return {
+    name: challenge.name,
+    rules: challenge.rules,
+    judgingCriteria: challenge.judgingCriteria,
+    durationS: chosenDurationS,
+  };
+}
+
+export function competitorView(user: User): CompetitorView {
+  return {
+    id: user.id,
+    handle: user.handle,
+    displayName: user.displayName,
+    avatarUrl: user.avatarUrl,
+  };
+}
+
+/**
  * Aplica um evento no duelo, em nome de um dos competidores.
  *
  * A transição é registrada mesmo quando leva a cancelamento — principalmente
@@ -94,6 +142,74 @@ export async function applyDuelEvent(
     return { problem: 'transicao_invalida' };
   }
 
+  try {
+    return { duel: await persistirTransicoes(prisma, duel, resultado, now, video) };
+  } catch (erro) {
+    // O duelo saiu do estado em que estava entre a leitura e a gravação: o
+    // evento deste clique já não se aplica ao duelo de agora.
+    if (erro instanceof TransicaoPerdida) return { problem: 'transicao_invalida' };
+    throw erro;
+  }
+}
+
+/**
+ * Outro alguém moveu o duelo primeiro.
+ *
+ * Não é erro do sistema: é a corrida sendo perdida, e cada ponto de entrada
+ * sabe o que responder — quem clicou recebe "transição inválida", e o
+ * relógio simplesmente segue para o próximo duelo.
+ */
+class TransicaoPerdida extends Error {}
+
+/**
+ * Move o duelo porque o **prazo venceu**, não porque alguém clicou (C-40).
+ *
+ * Sem isto, os prazos escritos em `duel-state.ts` existem e ninguém os
+ * aplica: o pior caso é a janela de votação, que nunca fecharia sozinha —
+ * e aí quem encerra o julgamento é um dos julgados.
+ *
+ * Devolve `null` quando não havia nada vencido. Quem chama é o relógio, e
+ * ele chama em laço.
+ */
+export async function tickDuel(
+  prisma: PrismaClient,
+  duel: Duel,
+  now: Date,
+  video?: VideoProvider,
+): Promise<DuelView | null> {
+  const vencida = tick(snapshotOf(duel), now.getTime());
+  if (vencida === null) return null;
+
+  try {
+    return await persistirTransicoes(prisma, duel, vencida, now, video);
+  } catch (erro) {
+    // Um clique chegou antes do relógio: o duelo já andou, e está certo.
+    if (erro instanceof TransicaoPerdida) return null;
+    throw erro;
+  }
+}
+
+/**
+ * O que acontece depois de decidida a primeira passagem.
+ *
+ * Duas coisas movem o duelo: um competidor clicando (`applyDuelEvent`) e o
+ * relógio vencendo (`tickDuel`, C-40). Elas diferem só em **como escolhem a
+ * transição** — daí para baixo é idêntico: encadear estados instantâneos,
+ * gravar cada passagem, mover a mídia, apurar no RESULTADO e avisar o tempo
+ * real.
+ *
+ * Por isso o corpo é um só. Duplicar deixaria o `pg_notify` e a auditoria em
+ * dois lugares, e um dia só um deles seria corrigido.
+ */
+async function persistirTransicoes(
+  prisma: PrismaClient,
+  duel: Duel,
+  resultado: TransitionResult,
+  now: Date,
+  video: VideoProvider | undefined,
+): Promise<DuelView> {
+  const duelId = duel.id;
+
   // Estado de duração zero anda sozinho. O ACEITE é assim: o arquivo de
   // regras o chama de instantâneo, e ele existe para aparecer na auditoria
   // como ponto de não retorno — não para o duelo ficar parado nele.
@@ -110,6 +226,15 @@ export async function applyDuelEvent(
   // está assistindo, e evita duelo em "resultado" sem resultado.
   const apuracao = snapshot.state === 'result' ? await tallyOf(prisma, duelId) : null;
 
+  // O duelo ganha desafio ao entrar em ESCOLHA (C-10). Não há rota de
+  // criação de duelo — matchmaking é Fase 2 —, então este é o momento certo:
+  // o estado existe para escolher, e a Fase 1 escolhe sozinha porque só há
+  // uma categoria. Quem escolhe de verdade é o público, na C-19.
+  const desafio =
+    transitions.some((passagem) => passagem.to === 'choosing') && duel.challengeId === null
+      ? await desafioDaVez(prisma)
+      : null;
+
   // A mídia acompanha o estado: palco no ACEITE, composição na EXECUÇÃO, e
   // tudo desligado quando o duelo sai do ar. Cada passagem conta — inclusive
   // as automáticas, senão o palco do ACEITE nunca abriria. Falha de mídia não
@@ -123,13 +248,21 @@ export async function applyDuelEvent(
   }
 
   const atualizado = await prisma.$transaction(async (tx) => {
-    const gravado = await tx.duel.update({
-      where: { id: duelId },
+    // A gravação só vale se o duelo ainda estiver **exatamente** onde estava
+    // quando foi lido. Sem isso, dois competidores clicando ao mesmo tempo —
+    // ou o relógio e um clique — gravariam duas passagens para a mesma
+    // transição, e auditoria com passagem duplicada é pior que auditoria
+    // faltando.
+    const { count } = await tx.duel.updateMany({
+      where: { id: duelId, state: duel.state, stateEnteredAt: duel.stateEnteredAt },
       data: {
         state: snapshot.state,
         stateEnteredAt: now,
         ...(snapshot.state === 'running' ? { startedAt: now } : {}),
         ...(snapshot.state === 'result' || snapshot.state === 'cancelled' ? { endedAt: now } : {}),
+        ...(desafio === null
+          ? {}
+          : { challengeId: desafio.challengeId, chosenDurationS: desafio.durationS }),
         ...midia,
         ...(apuracao === null
           ? {}
@@ -141,6 +274,23 @@ export async function applyDuelEvent(
             }),
       },
     });
+    if (count === 0) throw new TransicaoPerdida();
+
+    const gravado = await tx.duel.findUniqueOrThrow({ where: { id: duelId } });
+
+    // O aviso ao tempo real sai daqui de dentro, e não depois (C-38).
+    //
+    // `pg_notify` numa transação só é entregue se ela der certo. Isso torna
+    // impossível avisar de uma transição que não aconteceu — garantia que
+    // uma chamada HTTP depois do commit não daria, e que importa porque é
+    // este aviso que abre a janela de votação na tela de todo mundo.
+    //
+    // Vai só o estado final: a cadeia automática (ACEITE é instantâneo)
+    // renderia três avisos seguidos, e a tela só piscaria.
+    await tx.$executeRaw`SELECT pg_notify(${DUEL_STATE_CHANNEL}, ${JSON.stringify({
+      duelId,
+      state: snapshot.state,
+    })})`;
 
     // Toda passagem vira linha, inclusive as automáticas: auditoria com buraco
     // não é auditoria (convenção 3).
@@ -161,7 +311,7 @@ export async function applyDuelEvent(
     return gravado;
   });
 
-  return { duel: duelView(atualizado) };
+  return duelView(atualizado);
 }
 
 /**
@@ -248,6 +398,30 @@ export async function voteStatus(
   };
 }
 
+/**
+ * O desafio que o duelo vai executar, e por quanto tempo (C-10).
+ *
+ * A Fase 1 lança com uma categoria só — Aura / Presença —, então não há o que
+ * sortear: é o desafio ativo. O tempo é a **opção do meio** das que o
+ * catálogo oferece: escolher pelo público é a C-19, e até lá o meio é o que
+ * não distorce — nem o mais fácil, nem o mais difícil.
+ *
+ * Sem desafio ativo no banco, o duelo anda sem desafio, como andava antes.
+ * Ficar preso porque a semente não rodou seria pior do que a tela dizer menos.
+ */
+async function desafioDaVez(
+  prisma: PrismaClient,
+): Promise<{ challengeId: string; durationS: number } | null> {
+  const desafio = await prisma.challenge.findFirst({ where: { active: true } });
+  if (desafio === null) return null;
+
+  const opcoes = desafio.durationOptionsS;
+  const meio = opcoes[Math.floor(opcoes.length / 2)];
+  if (meio === undefined) return null;
+
+  return { challengeId: desafio.id, durationS: meio };
+}
+
 /** O que a mídia precisa virar quando o duelo entra num estado. */
 type MediaPatch = {
   stageId?: string | null;
@@ -308,7 +482,7 @@ async function moveMedia(
  * Isso acontece quando a mídia falha na transição para EXECUÇÃO: a transição
  * segue assim mesmo, porque auditoria vale mais que palco, e o duelo fica no
  * ar **sem ninguém poder assistir**. Não há agendador nesta fase — ele é a
- * C-16 —, então a segunda chance acontece no próximo momento em que alguém
+ * C-40 —, então a segunda chance acontece no próximo momento em que alguém
  * bate na API por causa deste duelo, que é o competidor pedindo credencial.
  */
 async function garantirComposicao(

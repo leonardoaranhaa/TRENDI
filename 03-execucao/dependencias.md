@@ -13,7 +13,7 @@ L-03 (fornecedor de vídeo) ✅ Amazon IVS, decisão D-20
   └─→ C-03 (SDK) ✅
         └─→ C-04 (captação WebRTC) ✅
               └─→ C-05 (composição split-screen) ✅
-                    ├─→ C-06 (sala de duelo)
+                    ├─→ C-06 (sala de duelo) ✅ ─→ C-38 (aviso de estado) ✅
                     └─→ C-21 (clipes)
                           └─→ C-29 (clipes premium)
 ```
@@ -60,7 +60,7 @@ L-17 (apps OAuth registrados)
 
 ```
 L-06 (regras da plataforma) ✅ três regras de conduta, decisão D-21
-  ├─→ C-10 (desafio da fase 1) ← desbloqueada
+  ├─→ C-10 (desafio da fase 1) ✅ ─→ C-40 (relógio do duelo) ✅
   ├─→ C-20 (catálogo fase 2)
   └─→ C-26 (catálogo completo)
 ```
